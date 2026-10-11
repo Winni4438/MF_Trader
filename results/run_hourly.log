@@ -1,0 +1,12 @@
+/home/user/MF_Trader/mf_trader/data/panel.py:41: UserWarning: Converting to PeriodArray/Index representation will drop timezone information.
+  qid = pd.Series((c.index + pd.Timedelta(days=10)).to_period("Q").astype(str), index=c.index)
+/home/user/MF_Trader/mf_trader/data/panel.py:41: UserWarning: Converting to PeriodArray/Index representation will drop timezone information.
+  qid = pd.Series((c.index + pd.Timedelta(days=10)).to_period("Q").astype(str), index=c.index)
+/home/user/MF_Trader/mf_trader/data/panel.py:41: UserWarning: Converting to PeriodArray/Index representation will drop timezone information.
+  qid = pd.Series((c.index + pd.Timedelta(days=10)).to_period("Q").astype(str), index=c.index)
+[     2s] Assets: ['SPX', 'NDX', 'DAX', 'NKY', 'BTC', 'ETH', 'AUDJPY', 'MXN', 'COPPER', 'UST', 'BUND', 'GOLD', 'JPY', 'CHF', 'USD', 'OIL', 'SILVER']
+[     4s] Features fertig
+[     4s] Ereignisstudie
+[     8s] riskoff Ereignisse: 528
+[     8s] riskon Ereignisse: 382
+[     8s] Gitter Rotation Follower

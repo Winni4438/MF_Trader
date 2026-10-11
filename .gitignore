@@ -1,0 +1,6 @@
+# Rohdaten und Zwischenstände werden per Skript erzeugt (siehe README)
+data/raw/
+data/processed/
+__pycache__/
+*.pyc
+.venv/
