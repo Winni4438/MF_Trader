@@ -1,0 +1,1153 @@
+<title>Money Flow Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ruhiger Lesefluss in einer Textspalte (~68ch), Abbildungen dürfen breiter laufen; Kennzahlenleiste oben. */
+:root {
+  --bg: #f3f5f2;          /* Seite: kühles Grau mit grünem Stich */
+  --surface: #fcfcfb;     /* Diagramm-/Kartenfläche */
+  --ink: #15201d;         /* Fließtext */
+  --ink-2: #4d5853;       /* Nebentext */
+  --muted: #7b8580;       /* Achsen, Labels */
+  --rule: #dde2dd;        /* Haarlinien */
+  --accent: #8a5a12;      /* Bronze: 'Geld fließt' – sparsam für Akzente */
+  --accent-soft: #f1e7d6;
+  --neg: #c23b3b;
+  --pos: #1d6fc4;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300;
+  --grid: #e1e0d9; --baseline: #c3c2b7;
+  --div-neg: 227, 73, 72; --div-pos: 42, 120, 214; --div-mid: 240, 239, 236;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1080px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #1a1a19; --ink: #e8ece9; --ink-2: #b9c1bc; --muted: #8e9792; --rule: #2c312e;
+    --accent: #d9a35a; --accent-soft: #2e2618; --neg: #e66767; --pos: #5a9be8;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+    --grid: #2c2c2a; --baseline: #383835;
+    --div-neg: 230, 103, 103; --div-pos: 57, 135, 229; --div-mid: 56, 56, 53;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #1a1a19; --ink: #e8ece9; --ink-2: #b9c1bc; --muted: #8e9792; --rule: #2c312e;
+  --accent: #d9a35a; --accent-soft: #2e2618; --neg: #e66767; --pos: #5a9be8;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+  --grid: #2c2c2a; --baseline: #383835;
+  --div-neg: 230, 103, 103; --div-pos: 57, 135, 229; --div-mid: 56, 56, 53;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.62; }
+.page { padding-inline: 20px; padding-block: 40px 80px; display: flex; flex-direction: column; align-items: center; }
+.col { width: 100%; max-width: var(--measure); min-width: 0; }
+.wide { width: 100%; max-width: var(--wide); min-width: 0; }
+header.hero { width: 100%; max-width: var(--wide); display: grid; gap: 14px; padding-block: 8px 28px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1, h2, h3, h4 { font-family: var(--font-display); font-stretch: 88%; color: var(--ink); text-wrap: balance; line-height: 1.15; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; letter-spacing: -.015em; margin: 0; }
+.dek { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.byline { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); }
+.glance { width: 100%; max-width: var(--wide); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; margin-bottom: 36px; }
+.glance div { background: var(--surface); padding: 16px 18px; display: grid; gap: 4px; align-content: start; }
+.glance b { font-family: var(--font-display); font-stretch: 90%; font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+.glance span { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; }
+.glance .tag { font-family: var(--font-data); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+nav.toc { width: 100%; max-width: var(--wide); border-left: 2px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 30px; }
+nav.toc p { margin: 0 0 6px; font-family: var(--font-data); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+nav.toc ol { margin: 0; padding-left: 20px; display: grid; gap: 3px; font-size: 15.5px; }
+nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+nav.toc a:hover, nav.toc a:focus-visible { border-bottom-color: var(--accent); }
+article { width: 100%; max-width: var(--wide); display: flex; flex-direction: column; align-items: flex-start; }
+article > * { width: 100%; max-width: var(--measure); min-width: 0; }
+article h2 { font-size: 30px; font-weight: 750; margin: 52px 0 10px; padding-top: 14px; border-top: 1px solid var(--rule); }
+article h3 { font-size: 21px; font-weight: 700; margin: 30px 0 6px; }
+article h4 { font-size: 17px; font-weight: 700; margin: 22px 0 4px; }
+article p, article li { color: var(--ink); }
+article p.lead { font-size: 19px; line-height: 1.6; color: var(--ink); padding-bottom: 6px; }
+article p > em:only-child { font-size: 14px; color: var(--ink-2); }
+article a { color: var(--accent); text-underline-offset: 2px; word-break: break-word; }
+article strong { font-weight: 600; }
+article blockquote { margin: 18px 0; padding: 10px 18px; background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 4px 4px 0; color: var(--ink); }
+article code { font-family: var(--font-data); font-size: .86em; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; }
+article pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; overflow-x: auto; font-size: 13.5px; }
+article pre code { border: 0; padding: 0; background: none; }
+article hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+.tablewrap { overflow-x: auto; margin: 16px 0; max-width: var(--wide) !important; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-family: var(--font-body); }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--font-display); font-stretch: 90%; font-weight: 650; font-size: 13.5px; color: var(--ink-2); background: var(--bg); }
+td { font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+figure.chart { max-width: var(--wide) !important; width: 100%; margin: 26px 0 30px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 18px 12px; display: grid; gap: 10px; }
+figure.chart figcaption { display: grid; gap: 3px; }
+figure.chart figcaption b { font-family: var(--font-display); font-stretch: 90%; font-size: 17px; color: var(--ink); }
+figure.chart figcaption span { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+.chartbox { position: relative; height: 340px; min-width: 0; }
+.chartbox.tall { height: 400px; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.duo h4 { margin: 0 0 4px; font-family: var(--font-display); font-size: 14px; color: var(--ink-2); font-weight: 650; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; width: fit-content; }
+.seg button { font: 500 13px var(--font-data); background: var(--surface); color: var(--ink-2); border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+details.data { font-size: 13.5px; color: var(--ink-2); }
+details.data summary { cursor: pointer; font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+details.data .tablewrap { margin: 8px 0 0; }
+.heat td, .heat th { text-align: center; padding: 6px 6px; font-family: var(--font-data); font-size: 12px; white-space: nowrap; }
+.heat th.rowh { text-align: left; font-family: var(--font-display); font-size: 12.5px; }
+.heat td { color: var(--ink); }
+.legend-div { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); font-family: var(--font-data); flex-wrap: wrap; }
+.legend-div i { display: inline-block; width: 120px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, rgb(var(--div-neg)), rgb(var(--div-mid)), rgb(var(--div-pos))); }
+.fallback-img { width: 100%; height: auto; border-radius: 4px; }
+footer.note { width: 100%; max-width: var(--wide); margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-2); }
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .page { padding-inline: 16px; padding-block: 24px 56px; }
+  article h2 { font-size: 25px; }
+  .chartbox { height: 300px; }
+  figure.chart { padding: 12px 10px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">Recherche &amp; Simulation · Cross-Asset · Stand Oktober 2026</div>
+    <h1>Money Flow Trading</h1>
+    <p class="dek">Kann ein Retail-Trader Kapitalrotationen zwischen Anlageklassen erkennen, während sie passieren, und vollautomatisch auf den fahrenden Zug aufspringen? Recherche aus fünf Blickwinkeln plus eigene Backtests auf Stundendaten 2019–2026.</p>
+    <div class="byline">17 Instrumente · 7¼ Jahre Stundendaten · über 1.000 getestete Varianten · Kosten, Latenz und Placebo-Tests berücksichtigt</div>
+  </header>
+  <section class="glance" aria-label="Auf einen Blick">
+    <div><span class="tag">Folgen der Rotation</span><b>0 von 900</b><span>getesteten Folge-Strategien sind nach Kosten im Optimierungszeitraum profitabel.</span></div>
+    <div><span class="tag">Wenn das Signal kommt</span><b>≈ 0–3 bps</b><span>Fortsetzung bleibt im Schnitt übrig. Die Rotation ist bei Erkennung praktisch gelaufen.</span></div>
+    <div><span class="tag">Deine Ausgangsidee</span><b>Sharpe −0,51</b><span>Gold + Treasuries long, Bitcoin + Nasdaq short bei Risk-off, 2019–2026 nach Kosten.</span></div>
+    <div><span class="tag">Was funktioniert</span><b>Sharpe 1,02</b><span>Risk-on-Momentum in Aktienindex-Futures (4 h): schlägt alle 300 Zufalls-Placebos, muss sich aber noch im Vorwärtstest beweisen.</span></div>
+  </section>
+  <nav class="toc" aria-label="Inhalt"><p>Inhalt</p><ol><li><a href="#der-geldstrom-zeigt-sich-zuerst-im-preis-gemeldete-flusse-kommen-zu-spat">Der Geldstrom zeigt sich zuerst im Preis, gemeldete Flüsse kommen zu spät</a></li><li><a href="#profis-handeln-rotation-in-wochen-oder-mikrosekunden-die-stundenlucke-blieb-leer">Profis handeln Rotation in Wochen oder Mikrosekunden, die Stundenlücke blieb leer</a></li><li><a href="#vier-korbe-mit-wechselnden-rollen-welche-rotationen-haufig-sind-und-welche-zahlen">Vier Körbe mit wechselnden Rollen: welche Rotationen häufig sind und welche zahlen</a></li><li><a href="#900-varianten-kein-gewinner-was-die-eigene-simulation-zeigt">900 Varianten, kein Gewinner: Was die eigene Simulation zeigt</a></li><li><a href="#was-sich-lohnt-ein-langsamer-kern-zwei-kleine-satelliten-und-ein-stressschalter">Was sich lohnt: ein langsamer Kern, zwei kleine Satelliten und ein Stressschalter</a></li><li><a href="#fazit">Fazit</a></li></ol></nav>
+  <article>
+<p class="lead">Ja, du kannst als Retail-Trader Kapitalrotationen zwischen Anlageklassen erkennen, während sie laufen. Das geht aber fast nur über Preise, Aggressor-Volumen und Stressbarometer, denn sämtliche „echten“ Flussdaten (ETF-Zuflüsse, COT, Fondsflüsse, TIC) erscheinen Stunden bis Wochen zu spät. Das eigentliche Problem ist nicht das Sehen, sondern das Timing. In der eigenen Stunden-Simulation über 17 Märkte (Juli 2019 bis September 2026) waren beim Auslösen eines sauberen Risk-off-Signals bereits 90–100 % der Bewegung gelaufen. Danach folgten im Mittel nur 0–3 Basispunkte Fortsetzung, weniger als ein Round-Trip kostet, und binnen 24 Stunden gaben die sicheren Häfen sogar wieder nach. Folgerichtig verloren alle 900 getesteten Varianten des „Aufspringens“ im In-Sample nach Kosten, und deine Ausgangsidee (bei Risk-off Gold und T-Bonds long, Bitcoin und Nasdaq short) kam auf eine Sharpe Ratio von −0,51. Profis handeln Rotation entweder langsam als Trendfolge über Wochen (die großen Trendfolger im SG Trend Index liegen 2026 bei rund +16 %) oder in Mikrosekunden als Arbitrage. Die Stundenlücke dazwischen ist kein etabliertes Geschäftsmodell, weil Kosten und Umkehr den kleinen Rest auffressen. Tragfähig sind in den Daten drei andere Dinge: langsames Cross-Asset-Momentum auf Tagesbasis (eigene Out-of-Sample-Sharpe 0,70–0,78), das Mitlaufen bei starken Risk-on-Erleichterungsrallys in Aktienindex-Futures (Sharpe 1,02, aber erst nachträglich formuliert) und, deutlich fragiler, das Gegenhalten nach Panikschüben. Meine ehrliche Empfehlung: ein langsamer Trend-Kern in C#/LEAN mit IBKR-Futures, zwei kleine Intraday-Satelliten im Vorwärtstest und der Flow-Detektor als Auslöser für Gegenbewegungen und als Stressschalter. Als Startschuss zum Hinterherlaufen taugt er nicht.</p>
+<h2 id="der-geldstrom-zeigt-sich-zuerst-im-preis-gemeldete-flusse-kommen-zu-spat">Der Geldstrom zeigt sich zuerst im Preis, gemeldete Flüsse kommen zu spät</h2>
+<p>Stell dir Kapitalströme wie ein Gewitter vor. Der Blitz ist die Preisbewegung, der Donner sind die Statistiken, die hinterher melden, wie viel Geld wohin geflossen ist. Für einen Intraday-Händler zählt nur der Blitz. Dein Methodenbaukasten zerfällt damit in drei Gruppen:</p>
+<ul>
+<li><strong>Gemeldete Flüsse:</strong> zu langsam für Einstiege, brauchbar als Regimefilter.</li>
+<li><strong>In Echtzeit messbare Spuren des Flusses:</strong> Preise, Orderflow und Stressindikatoren.</li>
+<li><strong>Modellierte „erzwungene“ Flüsse regelgebundener Akteure:</strong> die einzige Kategorie, die überhaupt einen Blick nach vorn erlaubt.</li>
+</ul>
+<h3 id="gemeldete-flusse-sind-der-donner-nach-dem-blitz">Gemeldete Flüsse sind der Donner nach dem Blitz</h3>
+<p>Die Verzögerungsleiter ist eindeutig:</p>
+<ul>
+<li><strong>Bitcoin-ETF-Flüsse:</strong> Die Farside-Tabellen zu den US-Spot-Bitcoin-ETFs werden „typischerweise abends und nachts (US-Zeit)“ aktualisiert. Am ersten Tag sind sie oft unvollständig, später werden sie teils revidiert (<a href="https://farside.co.uk/">Farside</a>; <a href="https://newhedge.io/changelog/spot-etf-flows-live-pending.md">Newhedge</a>).</li>
+<li><strong>Fondsflüsse:</strong> Die ICI-Daten kommen wöchentlich mit rund einer Woche Verzug (<a href="https://www.ici.org/research/stats/flows">ICI</a>). EPFR liefert tägliche Fondsflüsse schon am Folgetag, aber nur gegen institutionelle Lizenz (<a href="https://ceibs.libguides.com/az/epfr-data">CEIBS</a>).</li>
+<li><strong>Positionsdaten:</strong> Die CFTC-Daten (COT) bilden den Dienstag ab und erscheinen freitags um 15:30 Uhr New Yorker Zeit (<a href="https://www.cftc.gov/MarketReports/CommitmentsOfTraders/index.htm">CFTC</a>).</li>
+<li><strong>Auslandskäufe:</strong> Die TIC-Daten zu Auslandskäufen von US-Wertpapieren hinken <strong>sechs bis acht Wochen</strong> hinterher (<a href="https://home.treasury.gov/data/treasury-international-capital-tic-system/release-dates-of-tic-data">US Treasury</a>).</li>
+<li><strong>Risiko- und Stressindizes:</strong> Selbst die schönsten Indizes sind Tagesware. Der Risk-on/Risk-off-Index der Kansas City Fed ist die erste Hauptkomponente täglicher Veränderungen von Kreditrisiko, Aktienvolatilität, Finanzierungsbedingungen sowie Währungen und Gold und liegt als CSV vor (<a href="https://www.kansascityfed.org/data-and-trends/risk-on-risk-off-index/">KC Fed</a>). Der Stressindex des OFR erscheint mit zwei Geschäftstagen Verzug (<a href="https://www.financialresearch.gov/financial-stress-index">OFR</a>).</li>
+<li><strong>Kreditspreads:</strong> Die High-Yield-Spreads auf FRED sind täglich und seit April 2026 auf ein rollierendes Dreijahresfenster beschnitten (<a href="https://eco3min.fr/en/credit-spreads-recession-risk-dataset/">eco3min</a>).</li>
+</ul>
+<p>Hinzu kommt, dass Flüsse dem Preis oft hinterherlaufen, statt ihn anzukündigen. Bei den Bitcoin-ETFs fand FalconX zwar einen Granger-Effekt der Vortageszuflüsse (p = 0,004). Die Flüsse erklären aber <strong>weniger als 10 % der Kursvarianz</strong> (<a href="https://www.falconx.io/newsroom/what-can-spot-etf-flows-tell-us-about-the-trajectory-of-bitcoin-prices-a-preliminary-statistical-investigation">FalconX</a>). Das oft zitierte R² von 0,80 zwischen 30-Tage-Flüssen und 30-Tage-Rendite misst einen gleichzeitigen Zusammenhang, keine Vorhersage (<a href="https://www.theblock.co/amp/post/359560/analyst-explains-why-etf-flows-continue-to-drive-bitcoins-price-while-treasury-companies-have-muted-impact">The Block</a>). Bei klassischen Fonds zeigt sich über lange Horizonte sogar das Gegenteil: Hohe Zuflüsse sagen niedrige spätere Renditen voraus, das berühmte „dumb money“ (<a href="https://nber.org/papers/w11526">Frazzini &amp; Lamont</a>). Gemeldete Flüsse gehören deshalb in die Regimeschicht, etwa als Vorab-Tendenz vor der europäischen Eröffnung oder als Bestätigung eines Trends. Als Auslöser für einen Einstieg taugen sie nie.</p>
+<h3 id="in-echtzeit-messbar-sind-preise-aggressoren-und-angstbarometer">In Echtzeit messbar sind Preise, Aggressoren und Angstbarometer</h3>
+<p>Live misst du die Spuren im Schnee, nicht das Tier selbst. Die robusteste Spur ist der Preis. Eine volatilitätsnormierte Rangliste der Renditen über einen festen Korb zeigt, wohin das marginale Kapital gerade fließt. In den Korb gehören Aktienindex-, Anleihen-, Gold-, Öl-, Kupfer- und Währungsfutures plus Bitcoin und Ether. Darauf lassen sich die Tagesindikatoren intraday nachbauen:</p>
+<ul>
+<li>ein laufender RORO-Faktor als erste Hauptkomponente der Renditen,</li>
+<li>Kritzmans Absorption Ratio als Maß dafür, wie gleichgeschaltet die Märkte sind (<a href="https://globalmarkets.statestreet.com/research/portal/insights/article/2a8e282a-343b-443c-b362-1634c71d2d26">State Street</a>),</li>
+<li>der Turbulenzindex als Mahalanobis-Distanz, dessen Stressphasen typischerweise <strong>Wochen</strong> anhalten (<a href="https://alphaarchitect.com/skulls-financial-turbulence-and-risk-management/">Alpha Architect</a>).</li>
+</ul>
+<p>Wichtig ist der Beipackzettel: Die Literatur hat diese Konstrukte auf Tagesdaten validiert. Intraday sind sie deine eigene Konstruktion und müssen sich erst im Backtest bewähren. Genau das hat die eigene Simulation getan (siehe unten). Ihr Flow-Score teilt die Stundenrendite durch die Volatilität, die für diese Tagesstunde üblich ist, und fasst das zu einem RORO-z-Wert zusammen. Er erkennt zuverlässig <strong>55–85 Risk-off- und 33–75 Risk-on-Schübe pro Jahr</strong> (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/signal_frequency.csv">eigene Berechnung: signal_frequency.csv</a>; <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/mf_trader/flow.py">Code: flow.py</a>).</p>
+<p>Die zweite Spur ist der Orderflow, also die Frage, wer gerade aggressiv kauft oder verkauft. Im Kryptomarkt ist das ein Geschenk:</p>
+<ul>
+<li><strong>Aggressorseite:</strong> Jede Binance-Kerze enthält das Taker-Kaufvolumen, und der aggTrades-Strom markiert die Aggressorseite jedes Trades. Damit lässt sich ein exaktes kumuliertes Volumendelta (CVD) kostenlos berechnen, in Echtzeit und historisch (<a href="https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints">Binance</a>).</li>
+<li><strong>Funding, Open Interest, Liquidationen:</strong> gibt es gratis dazu. Der Liquidationsstrom schickt aber nur die letzte Liquidation pro Symbol und Sekunde und liefert damit nur eine Untergrenze (<a href="https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams/Liquidation-Order-Streams">Binance</a>).</li>
+<li><strong>Futures-Taker-Statistik:</strong> reicht nur 30 Tage zurück. Wer sie backtesten will, muss selbst mitschreiben (<a href="https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Taker-BuySell-Volume">Binance</a>).</li>
+<li><strong>Cloud-Betrieb:</strong> Viele Rechenzentrums-IPs bekommen von Binance einen HTTP-451-Fehler (<a href="https://apify.com/ninhothedev/binance-futures-scraper">Apify</a>).</li>
+</ul>
+<p>Inhaltlich ist Orderflow allerdings ein Spiegel, kein Fernglas. Die Orderflow-Imbalance erklärt kurzfristige Preisänderungen fast linear (<a href="https://arxiv.org/abs/1011.6402">Cont, Kukanov &amp; Stoikov</a>), sagt aber wenig über die Zukunft. Eine Studie von 2026 an Krypto-Perpetuals findet nur an Viertelstundengrenzen Prognosekraft für die folgenden Stunden (<a href="https://arxiv.org/abs/2607.09426">arXiv 2607.09426</a>). Die eigene Messung bestätigt das deutlich: Die Binance-Taker-Imbalance korreliert mit der Bitcoin-Rendite <strong>derselben Stunde zu 0,44, mit der nächsten Stunde zu −0,005</strong> (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/crypto_extras.json">eigene Berechnung: crypto_extras.json</a>).</p>
+<p>On-Chain-Zuflüsse zu Börsen hatten 2017–2023 echte Prognosekraft auf 1–6 Stunden: ETH-Zuflüsse wirkten negativ, USDT-Zuflüsse positiv (<a href="https://arxiv.org/abs/2411.06327">arXiv 2411.06327</a>). In brauchbarer Auflösung sind sie aber kostenpflichtig. Am schwächsten schneiden klassische Balken-Indikatoren wie MFI, Chaikin Money Flow oder OBV ab. Ihre eigene Dokumentation warnt vor Fehlsignalen nach Kurslücken und in volatilen Phasen (<a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf">StockCharts</a>).</p>
+<p>Die dritte Spur sind Angstbarometer:</p>
+<ul>
+<li><strong>VIX:</strong> in Echtzeit über das Cboe-Indexabo bei IBKR (<a href="https://www.interactivebrokers.com/docs/general/market-data-subscriptions/popular-market-data-subscriptions/introduction">IBKR</a>).</li>
+<li><strong>DVOL (Krypto-Volatilität):</strong> kostenlos von Deribit (<a href="https://docs.deribit.com/api-reference/market-data/public-get_volatility_index_data.md">Deribit</a>).</li>
+<li><strong>Put/Call-Quoten:</strong> als halbstündliche Schnappschüsse bei Cboe (<a href="https://res.cboe.com/us/options/market_statistics">Cboe</a>).</li>
+<li><strong>MOVE (Anleihevolatilität):</strong> in Echtzeit nur über kostenpflichtige ICE-Feeds (<a href="https://developer.ice.com/fixed-income-data-services/catalog/ice-data-indices-move-index">ICE</a>).</li>
+</ul>
+<p>Vorsicht bei Indikatoren, die aus Kursquotes berechnet werden: Der VIX sprang am 5. August 2024 vor der US-Eröffnung auf fast 66. Das kam überwiegend von ausgeweiteten Optionsquotes, nicht von echten Trades (<a href="https://www.bis.org/publ/bisbull95.htm">BIS Bulletin 95</a>). Ein Barometer also, das im Sturm selbst wackelt.</p>
+<h3 id="erzwungene-flusse-sind-der-einzige-echte-blick-nach-vorn">Erzwungene Flüsse sind der einzige echte Blick nach vorn</h3>
+<p>Vorhersehbar sind nur die Flüsse, die jemand tun muss. Trendfolgende CTAs, volatilitätsgesteuerte Fonds, gehebelte ETFs und Pensionsfonds handeln nach Regeln, und die Banken modellieren genau das:</p>
+<ul>
+<li><strong>CTAs:</strong> BofA bildet zwölf Trendfolger unterschiedlicher Geschwindigkeit nach. Im August 2026 schätzte die Bank, dass nennenswerte CTA-Aktienverkäufe erst ab mehr als 4 % Rückgang einsetzen würden (<a href="https://www.tickmill.com/blog/institutional-insights-bofa-systematic-flows-monitor-11826">Tickmill/BofA</a>).</li>
+<li><strong>Vol-Control-Fonds:</strong> Sie reagieren auf realisierte, nicht auf implizite Volatilität (<a href="https://www.acadian-asset.com/-/media/files/commentary-pdfs/acadian--defensive-investing-strategies-feedback-loops-and-echoes-of-1987.pdf">Acadian</a>) und verwalten laut Nomura rund <strong>1,3 Billionen Dollar</strong> (<a href="https://invezz.com/en-ae/news/2026/04/08/volatility-funds-near-end-of-selling-spree-nomura-sees-stock-bounce/">Invezz</a>).</li>
+<li><strong>Pensionsfonds:</strong> Ihr Rebalancing drückt bei Aktienübergewicht die Rendite des Folgetags um <strong>etwa 17 bp</strong> (<a href="https://www.nber.org/papers/w33554">Harvey, Mazzoleni &amp; Melone</a>).</li>
+<li><strong>Optionshändler:</strong> Sie sichern Short-Gamma-Positionen ab, und das treibt nachweislich die Schlussbewegung (<a href="https://www3.nd.edu/~zda/intramom.pdf">Baltussen et al.</a>).</li>
+</ul>
+<p>All das kannst du aus Preisdaten näherungsweise selbst rechnen: CTA-Trigger aus 20/60/125/250-Tage-Signalen, Vol-Control-Druck aus realisierter Volatilität, Monatsend-Rebalancing aus dem Renditeabstand zwischen Aktien und Anleihen. Die veröffentlichten Bankschätzungen erreichen Privatanleger dagegen nur aus zweiter Hand und widersprechen sich. Für denselben Zeitraum kursierten Goldman-Zahlen von 33, 40 und über 100 Milliarden Dollar CTA-Verkäufen (<a href="https://www.mexc.com/news/666746">MEXC</a>; <a href="https://www.thewealthadvisor.com/article/goldman-says-momentum-traders-sell-stocks-every-scenario">The Wealth Advisor</a>).</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Methode / Datenquelle</th>
+<th>Was sie misst</th>
+<th>Verzögerung</th>
+<th>Zugang &amp; Kosten für dich</th>
+<th>Nutzen intraday</th>
+<th>Nutzen als Regimefilter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Volatilitätsnormierte Cross-Asset-Renditen, RORO-Faktor, Absorption Ratio, Turbulenz</td>
+<td>wohin Kapital gerade fließt, wie gleichgeschaltet die Märkte sind</td>
+<td>Echtzeit</td>
+<td>IBKR: CME/CBOT/COMEX-L1 je 1,55 USD/Monat, Eurex-L1 frei (<a href="https://www.interactivebrokers.com/en/pricing/market-data-pricing.php">IBKR</a>)</td>
+<td><strong>hoch – Kern der Erkennung</strong></td>
+<td>hoch</td>
+</tr>
+<tr>
+<td>Krypto-Taker-Volumen, CVD, Funding, Open Interest, Liquidationen</td>
+<td>Aggressoren, Hebelaufbau</td>
+<td>Sekunden</td>
+<td>Binance/Deribit frei; CoinGlass-API ab 29 USD/Monat (<a href="https://coinglass.com/pricing">CoinGlass</a>)</td>
+<td>mittel (nur gleichzeitig, als Bestätigung)</td>
+<td>mittel</td>
+</tr>
+<tr>
+<td>Futures-Orderflow aus Tickdaten</td>
+<td>Aggressoren</td>
+<td>Echtzeit</td>
+<td>IBKR-Schnappschüsse alle 250 ms; ob CME-Trades mit Aggressorseite kommen, ist ungeprüft</td>
+<td>gering bis mittel</td>
+<td>gering</td>
+</tr>
+<tr>
+<td>VIX, DVOL, Kredit-ETF-Verhältnisse (z. B. HYG/IEF)</td>
+<td>Stress</td>
+<td>Echtzeit</td>
+<td>IBKR-Cboe-Abo; Deribit frei</td>
+<td>mittel (Stressschalter)</td>
+<td>hoch</td>
+</tr>
+<tr>
+<td>MOVE, Dealer-Gamma (GEX) in Echtzeit</td>
+<td>Zinsvolatilität, Gamma-Regime</td>
+<td>Echtzeit</td>
+<td>nur kostenpflichtig</td>
+<td>gering</td>
+<td>mittel</td>
+</tr>
+<tr>
+<td>CTA-, Vol-Control-, Rebalancing-Modelle</td>
+<td>erzwungene künftige Flüsse</td>
+<td>vorab berechenbar</td>
+<td>selbst aus Preisen; Bankstudien nur indirekt</td>
+<td>mittel um Triggerlevels, Handelsschluss, Monatsende</td>
+<td>hoch</td>
+</tr>
+<tr>
+<td>Spot-ETF-Flüsse (BTC/ETH)</td>
+<td>echte Zeichnungen und Rückgaben</td>
+<td>US-Abend, revidiert</td>
+<td>frei (Farside)</td>
+<td>keiner für Einstiege</td>
+<td>hoch für Krypto</td>
+</tr>
+<tr>
+<td>COT, ICI, TIC, EPFR</td>
+<td>Positionierung, Fondsflüsse</td>
+<td>1 Woche bis 2 Monate</td>
+<td>frei (EPFR teuer)</td>
+<td>keiner</td>
+<td>mittel</td>
+</tr>
+<tr>
+<td>KC-Fed-RORO, OFR-FSI, HY-Spreads</td>
+<td>Risikoappetit, Stress</td>
+<td>1–2 Tage</td>
+<td>frei</td>
+<td>keiner</td>
+<td>hoch</td>
+</tr>
+<tr>
+<td>MFI, CMF, OBV, A/D</td>
+<td>Kauf- und Verkaufsdruck aus OHLC-Balken</td>
+<td>Echtzeit</td>
+<td>frei</td>
+<td>gering</td>
+<td>gering</td>
+</tr>
+</tbody>
+</table></div>
+<p>Für IBKR als Datenquelle heißt das konkret: Die Daten sind billig, aber die API hat zwei Engpässe. Sie liefert Futures-Kurse als <strong>Schnappschüsse alle 250 Millisekunden</strong> (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/market-data-live/top-of-book-l-1/market-data-update-frequency">IBKR</a>). Und sie erlaubt höchstens <strong>60 historische Abfragen pro zehn Minuten</strong> (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/market-data-historical/historical-data-limitations/pacing-violations-for-small-bars-30-secs-or-less">IBKR</a>). Für eine Erkennung im Minuten- bis Stundentakt reicht das locker. Für mehrjährige Intraday-Backtests ist IBKR ungeeignet, weshalb die eigene Simulation auf HistData, Dukascopy und Binance zurückgriff (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/README.md">README</a>).</p>
+<h2 id="profis-handeln-rotation-in-wochen-oder-mikrosekunden-die-stundenlucke-blieb-leer">Profis handeln Rotation in Wochen oder Mikrosekunden, die Stundenlücke blieb leer</h2>
+<p>Die kurze Antwort auf deine zweite Frage: In der von dir beschriebenen Form betreibt keine große Profi-Kategorie das als eigenständige Strategie. Gemeint ist: Rotation erkennen, für Stunden aufspringen, bei nachlassendem Momentum aussteigen. Spektakulär verworfen wurde die Idee nicht, sie wurde eher zwischen zwei Stühlen zerrieben. Auf der langsamen Seite verdienen Trendfolger an Rotationen, die sich über Wochen entfalten. Auf der schnellen Seite schöpfen Hochfrequenzhändler die kurzen Brüche im Gleichlauf zwischen Märkten in Millisekunden ab. Wer auf dem Bahnsteig steht, während die einen im Stellwerk sitzen und die anderen nach Fahrplan reisen, hat beim Einsteigen schlechte Karten. Dazwischen sitzen die Flow-Desks der Banken (JPMorgan, Goldman, BofA). Sie handeln Rotation nicht selbst, sondern rechnen ihren Kunden vor, was die regelgebundenen Akteure tun müssen (<a href="https://www.tickmill.com/blog/institutional-insights-jpmorgan-flows-positioning-130125">Tickmill/JPM</a>).</p>
+<h3 id="trendfolger-verdienen-an-wochen-nicht-an-stunden">Trendfolger verdienen an Wochen, nicht an Stunden</h3>
+<p>Die professionelle Form des „Money-Flow-Tradings“ ist Managed Futures. Der SG Trend Index umfasst die zehn größten Trendfolger, darunter AQR, Man, Winton und Transtrend (<a href="https://www.hedgeweek.com/sg-prime-services-releases-the-cta-indices-constituents-for-2026/">Hedgeweek</a>). Seit 2000 erzielte er im Schnitt <strong>5,33 % pro Jahr</strong> bei einem maximalen Drawdown von 20,61 %, 2025 nur +2,39 % (<a href="https://www.toptradersunplugged.com/trend-following-performance-report-december-2025/">TTU</a>). 2026 ist ein Paradejahr mit <strong>+16,14 % bis 11. Oktober</strong> (<a href="https://portal.barclayhedge.com/cgi-bin/indices/displayHfIndex.cgi?indexCat=SG-Prime-Services-Indices&amp;indexName=SG-Trend-Index">BarclayHedge</a>). Verdient wurde das mit drei Positionen: short US-Anleihen vor dem Ausverkauf im September, long Dollar und long Rohöl seit Januar (<a href="https://hedgeco.net/news/?p=92151">HedgeCo</a>). Das sind Rotationen, aber über Monate, nicht über Stunden.</p>
+<p>Die Jahrhundert-Studie von AQR zeigt, warum das funktioniert. Trendfolge war in 8 der 10 schlimmsten 60/40-Drawdowns seit 1880 positiv, weil sich diese Bärenmärkte „allmählich über mehrere Monate statt abrupt über wenige Tage“ entwickelten (<a href="https://www.TrendFollowing.com/whitepaper/Century_Evidence_Trend_Following.pdf">Hurst, Ooi &amp; Pedersen</a>). In V-förmigen Schocks, also genau deinen Intraday-Ereignissen, verlieren Trendfolger dagegen. Nach dem Zollschock im April 2025 lag SG Trend bei <strong>−9,33 % seit Jahresbeginn</strong> (<a href="https://content.sgmarkets.com/CTA_UPDATE_KEEPING_UP_WITH_THE_TRENDFOLLOWERS_2025">SG CTA Update 2025</a>), einzelne Fonds verloren über 40 % in einem Monat (<a href="https://www.institutionalinvestor.com/index.php/article/top-managed-futures-funds-are-down-sharply-liberation-day">Institutional Investor</a>).</p>
+<p>Am nächsten an deiner Idee sind kurzfristige CTAs. Der SG Short-Term Traders Index hielt sich im April 2025 mit etwa −0,9 % deutlich besser (<a href="https://content.sgmarkets.com/CTA_UPDATE_KEEPING_UP_WITH_THE_TRENDFOLLOWERS_2025">SG CTA Update 2025</a>). Im starken Trendjahr 2026 liegt er aber nur bei +5,32 % (<a href="https://portal.barclayhedge.com/cgi-bin/indices/displayHfIndex.cgi?indexCat=SG-Prime-Services-Indices&amp;indexName=SG-Short-Term-Traders-Index">BarclayHedge</a>). Wie viel Maschinerie dahintersteht, zeigt Crabel (Stand 2019) (<a href="https://thehedgefundjournal.com/crabel-contra/">The Hedge Fund Journal</a>):</p>
+<ul>
+<li>Das Flaggschiff hält Positionen im Schnitt etwa einen Tag.</li>
+<li>99 % der Orders gehen von co-lokalisierten Servern mit rund <strong>15 Mikrosekunden</strong> Latenz direkt an die Börse.</li>
+<li>Pro Million Dollar Kapital dreht es etwa 15.000 Round-Turns im Jahr.</li>
+<li>Jedes Jahr werden 10–15 % der Modelle ersetzt, weil Signale verfallen.</li>
+</ul>
+<p>Bezeichnend ist Crabels Produkt „Contra“. Es entstand, weil Kunden nach den abrupten Umkehrungen von 2018 eine schnellere Krisenabsicherung wollten. Sein Schutzbaustein „produziert Fehlalarme, die typischerweise moderate Verluste verursachen“ (ebd.).</p>
+<p>Man AHL beziffert das Grundgesetz dahinter. Alle Trendgeschwindigkeiten haben brutto eine positive Sharpe Ratio. Nach Kosten ist sie für schnelle Varianten aber „langfristig deutlich niedriger“, obwohl schnelle Systeme in den schlimmsten Aktienphasen die besten Krisenrenditen liefern (<a href="https://www.man.com/insights/need-for-speed-trend-following">Man Group</a>). Du zahlst pro Umschlag mehr als AHL mit seinem Kostenmodell für fünf Milliarden Dollar, also trifft dich dieses Gesetz härter.</p>
+<p>Am anderen Ende steht die Hochfrequenz. Die Preisfindung bei US-Anleihen und US-Aktien findet überwiegend in Futures statt (<a href="https://benny.aeaweb.org/conference/2018/preliminary/paper/QdkHkBSZ">Dobrev &amp; Schaumburg</a>). Zwischen ES-Future und SPY gibt es rund 1.000 Arbitragegelegenheiten pro Tag, zusammen etwa 75 Millionen Dollar im Jahr, und sie gehen vollständig an die Schnellsten (<a href="https://conference.nber.org/conf_papers/f69665.pdf">Budish, Cramton &amp; Shim</a>). Geplante Makrodaten sind binnen <strong>ein bis zwei Minuten</strong> eingepreist (<a href="https://www.bis.org/publ/work71.pdf">Fleming &amp; Remolona</a>). Mit 250-Millisekunden-Schnappschüssen bist du hier vier bis fünf Größenordnungen zu langsam.</p>
+<h3 id="die-forschung-kennt-den-fahrplan-der-panik-der-erste-tag-ist-fast-alles">Die Forschung kennt den Fahrplan der Panik: Der erste Tag ist fast alles</h3>
+<p>Warum die Stundenlücke so wenig hergibt, erklärt die beste Studie zu Fluchtbewegungen. Baele, Bekaert, Inghelbrecht und Wei identifizieren in 23 Ländern von 1980 bis 2015 „Flight-to-Safety“-Tage (<a href="https://business.columbia.edu/sites/default/files-efs/citation_file_upload/Flights%20to%20Safety.pdf">Baele et al. 2020</a>):</p>
+<ul>
+<li>Sie machen <strong>weniger als 2 % aller Tage</strong> aus.</li>
+<li>Am ersten Tag schlagen Anleihen Aktien um durchschnittlich 2,79 %.</li>
+<li><strong>62 % der Episoden dauern nur einen Tag</strong>, keine länger als zehn.</li>
+<li>An den Folgetagen schrumpft der Effekt auf −0,13 % pro Tag bei Aktien und +0,05 % bei Anleihen.</li>
+<li>Franken (+0,33 %) und Yen (+0,44 %) werten an solchen Tagen verlässlich auf. Gold legt im Schnitt nur 3 bp zu und wird erst nach Herausrechnen seines Aktienbetas zum Hafen.</li>
+</ul>
+<p>Golds Schutzwirkung nach Extremschocks hält laut Baur und Lucey außerdem nur rund 15 Handelstage (<a href="https://www.tcd.ie/triss/assets/PDFs/iiis/iiisdp198.pdf">Baur &amp; Lucey</a>). Wer also erst nach dem „Erkennen“ einsteigt, bekommt bestenfalls den Rest von Tag eins.</p>
+<p>Danach regiert die Umkehr. Kursdruck aus Fondsflüssen bildet sich in Israel zur Hälfte binnen zehn Handelstagen zurück (<a href="https://ideas.repec.org/a/cup/jfinqa/v46y2011i02p585-603_00.html">Ben-Rephael, Kandel &amp; Wohl, JFQA</a>), in den USA zu 85 % binnen vier Monaten (<a href="https://en-coller.tau.ac.il/sites/nihul_en.tau.ac.il/files/RP_219_Wohl_0.pdf">Ben-Rephael, Kandel &amp; Wohl, JFE</a>). Die Schlussbewegung, die aus Absicherungsgeschäften entsteht, kehrt in ein bis drei Tagen um (<a href="https://www3.nd.edu/~zda/intramom.pdf">Baltussen et al.</a>). Savor liefert den Schlüssel: Große Kursbewegungen mit neuer Information laufen weiter, solche ohne Information kehren um (<a href="https://repository.upenn.edu/handle/20.500.14332/34495">Savor 2012</a>). Daraus folgt eine Arbeitshypothese, die die eigene Simulation stützt. Panikschübe sind oft Liquiditäts- und Hebelereignisse ohne neue Fundamentalinformation und kehren deshalb um. Erleichterungsrallys beruhen dagegen häufig auf einer echten Nachricht, etwa einer Zollpause oder einer Notenbankzusage, und laufen deshalb Stunden nach.</p>
+<p>Ganz leer ist das Intraday-Feld nicht. Der am besten belegte Effekt ist das „Market Intraday Momentum“: Die Rendite bis kurz vor Handelsschluss sagt die letzte halbe Stunde voraus.</p>
+<ul>
+<li><strong>Baltussen et al.:</strong> In 62 Futures von 1974 bis 2020 liegt die Brutto-Sharpe zwischen <strong>0,87 (Währungen) und 1,73 (Aktienindizes)</strong>. Der Effekt ist stärker an volatilen Tagen und wenn Optionshändler short Gamma sind (<a href="https://www3.nd.edu/~zda/intramom.pdf">Baltussen et al.</a>).</li>
+<li><strong>Gao et al.:</strong> Für SPY brachte die Strategie 1993–2013 eine Sharpe von 1,08 bei nur 30 Minuten Marktzeit pro Tag (<a href="https://c.mql5.com/forextsd/forum/173/intraday_momentum_-_the_first_half-hour_return_predicts_the_last_half-hour_return.pdf">Gao et al.</a>).</li>
+</ul>
+<p>Der Bruttovorteil liegt aber rechnerisch nur bei rund 2,7 bp pro Handelstag, und die Erklärungskraft bei etwa 2 %. Im Devisenmarkt ist der Effekt seit 2000 statistisch verschwunden. Die Autoren schreiben selbst, er sei für viele Anleger nach Kosten möglicherweise nicht ausnutzbar (ebd.). Ein Arbeitspapier aus einem kommerziellen Haus meldet für eine Intraday-Trendregel auf SPY 2007–2024 eine Netto-Sharpe von 1,33 (<a href="https://www.sfi.ch/de/publications/n-24-97-beat-the-market-an-effective-intraday-momentum-strategy-for-s-p500-etf-spy">Zarattini, Aziz &amp; Barbon</a>). Das ist ein Indiz, dass Momentum in Aktienindizes intraday lebt, aber kein unabhängiger Beweis.</p>
+<p>Und Muster verfallen. Veröffentlichte Prognosefaktoren verlieren danach im Schnitt <strong>58 % ihrer Rendite</strong>, rein preisbasierte am stärksten (<a href="https://Www.Gwern.net/doc/economics/2016-mclean.pdf">McLean &amp; Pontiff</a>). Der berühmte „Overnight Drift“ zur europäischen Eröffnung brachte 1998–2020 rund 3,7 % pro Jahr und liegt seit 2021 bei null. Die ETFs, die ihn einsammeln sollten, wurden nach 14 Monaten geschlossen (<a href="https://libertystreeteconomics.newyorkfed.org/2026/07/the-disappearing-overnight-drift/">Liberty Street Economics</a>).</p>
+<h3 id="verworfen-wurden-der-ein-faktor-roro-der-anleihe-reflex-und-das-fondsfluss-folgen">Verworfen wurden der Ein-Faktor-RORO, der Anleihe-Reflex und das Fondsfluss-Folgen</h3>
+<p>Mehrere verwandte Ideen haben Profis tatsächlich abgeschrieben oder relativiert:</p>
+<ul>
+<li><strong>Reiner RORO-Handel als ein einziger Faktor:</strong> Von 2008 bis 2012 lief alles im Gleichschritt. Ab 2013 fielen die Korrelationen so stark, dass Marktbeobachter das Ende dieses Regimes ausriefen (<a href="https://www.marketsmedia.com/risk-on-risk-off-regime-heads-for-the-exit">Markets Media</a>). In Krisen kehrt der Gleichlauf zurück, im Alltag nicht.</li>
+<li><strong>Der Reflex „Risk-off heißt Staatsanleihen kaufen“:</strong> 2022 wurde die Aktien-Anleihe-Korrelation erstmals seit über 20 Jahren positiv (<a href="https://www.pgim.com:443/research/negative-correlation-dead-long-live-6040-portfolio">PGIM</a>). Im 36-Monats-Mittel stieg sie von <strong>−0,37 (2011–2021) auf +0,41</strong> (<a href="https://www.ssga.com/library-content/assets/pdf/global/wmu/2025/mom-20251003.pdf">SSGA</a>).</li>
+<li><strong>Fondsflüssen folgen:</strong> Das wirkt langfristig konträr (<a href="https://nber.org/papers/w11526">Frazzini &amp; Lamont</a>).</li>
+<li><strong>Sektorrotation nach Konjunkturzyklus:</strong> Selbst mit perfekter Voraussicht brachte sie nur 2,3 % pro Jahr, mit realistischem Timing verschwindet der Vorteil (<a href="https://www.cxoadvisory.com/economic-indicators/perfect-sector-rotation">CXO Advisory</a>; <a href="https://mro.massey.ac.nz/handle/10179/69590">Molchanov &amp; Stangl</a>).</li>
+</ul>
+<p>Überlebt haben drei Verwandte deiner Idee: langsame Trendfolge als Kern, schnelle Signale als Krisenversicherung mit eingeplanten Fehlalarmen und Risikoappetit-Indizes als Regimefilter.</p>
+<h2 id="vier-korbe-mit-wechselnden-rollen-welche-rotationen-haufig-sind-und-welche-zahlen">Vier Körbe mit wechselnden Rollen: welche Rotationen häufig sind und welche zahlen</h2>
+<p>Für ein Flow-System lassen sich handelbare Werte in vier Körbe sortieren:</p>
+<ul>
+<li><strong>Risiko- und Wachstumsanlagen:</strong> Aktien, besonders Tech, Small Caps und Schwellenländer; High-Yield-Kredit; Carry- und Rohstoffwährungen wie AUD und MXN; Industriemetalle; Krypto.</li>
+<li><strong>Sichere Häfen:</strong> Kernstaatsanleihen, US-Dollar, Yen, Franken, Gold.</li>
+<li><strong>Inflationsschutz:</strong> Energie, Rohstoffe, inflationsindexierte Anleihen, Value-Aktien.</li>
+<li><strong>Liquidität:</strong> T-Bills, Geldmarkt.</li>
+</ul>
+<p>Diese Einteilung ist allerdings kein Gesetz, sondern eine Wetterlage. Franken und Yen werten bei fallenden US-Aktien über Stunden bis Tage auf, besonders in Krisen (<a href="https://www.snb.ch/en/mmr/papers/id/working_paper_2007_17">Ranaldo &amp; Söderlind</a>). Defensive Aktien schlugen in Korrekturen von mehr als 15 % den Markt im Schnitt um <strong>mehr als 10 %</strong> (<a href="https://www.robeco.com/en-uk/insights/2025/10/what-to-do-when-safe-havens-turn-into-stormy-waters">Robeco</a>).</p>
+<p>Bitcoin ist seit 2020 ein Risikoasset mit hohem Beta. Seine Tageskorrelation zum S&amp;P 500 sprang von 0,01 (2017–2019) auf 0,36 (2020–2021) (<a href="https://www.imf.org/en/blogs/articles/2022/01/11/crypto-prices-move-more-in-sync-with-stocks-posing-new-risks">IMF</a>). Zum Nasdaq-100 lag sie 2025 bei 0,52 (<a href="https://www.theglobeandmail.com/investing/article-bitcoins-2025-rollercoaster-may-end-on-a-low">Reuters via Globe and Mail</a>). Sie schwankt aber stark, von 0,87 im Jahr 2024 auf etwa 0,3 im März 2026 (<a href="https://arxiv.org/abs/2501.09911v1">Wu 2025</a>; <a href="https://eco3min.fr/en/bitcoin-vs-nasdaq/">eco3min</a>). In einer Risk-off-Rotation ist Bitcoin damit Quelle, nie Ziel.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Korb</th>
+<th>Typische Instrumente für dich</th>
+<th>Wachstumsschreck</th>
+<th>Liquiditätskrise („Dash for Cash“)</th>
+<th>Inflations-/Zinsschock</th>
+<th>US-Politikschock („Sell America“)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risiko: Tech/Nasdaq, Small Caps, Europa</td>
+<td>MNQ, MES, M2K, Micro-DAX</td>
+<td>↓↓ (führt)</td>
+<td>↓↓</td>
+<td>↓↓</td>
+<td>↓↓</td>
+</tr>
+<tr>
+<td>Risiko: Krypto</td>
+<td>BTC/ETH (MBT, Perps)</td>
+<td>↓↓</td>
+<td>↓↓↓</td>
+<td>↓↓</td>
+<td>↓↓</td>
+</tr>
+<tr>
+<td>Risiko: Carry-FX</td>
+<td>AUDJPY, USDMXN</td>
+<td>↓</td>
+<td>↓↓</td>
+<td>gemischt</td>
+<td>gemischt</td>
+</tr>
+<tr>
+<td>Hafen: kurze Staatsanleihen</td>
+<td>2J-Treasury, Schatz</td>
+<td>↑ (am stärksten, SVB 2023)</td>
+<td>↑ (Bills)</td>
+<td>↓</td>
+<td>↑ (2J hielt im April 2025)</td>
+</tr>
+<tr>
+<td>Hafen: lange Staatsanleihen</td>
+<td>ZN/ZB, Bund</td>
+<td>↑</td>
+<td>↓ (März 2020)</td>
+<td>↓↓ (2022, 2026)</td>
+<td>US-Langläufer ↓↓, Bund ↑</td>
+</tr>
+<tr>
+<td>Hafen: Yen</td>
+<td>6J, USDJPY</td>
+<td>↑↑ (Carry-Unwind)</td>
+<td>gemischt</td>
+<td>↓ (Zinsdifferenz)</td>
+<td>↑</td>
+</tr>
+<tr>
+<td>Hafen: Franken</td>
+<td>USDCHF, EURCHF</td>
+<td>↑</td>
+<td>↑</td>
+<td>gemischt</td>
+<td>↑</td>
+</tr>
+<tr>
+<td>Hafen: US-Dollar</td>
+<td>Dollar-Index, EURUSD</td>
+<td>↑</td>
+<td>↑↑</td>
+<td>↑</td>
+<td>↓↓</td>
+</tr>
+<tr>
+<td>Hafen/Inflationsschutz: Gold</td>
+<td>MGC, GC</td>
+<td>↑ (kurzlebig)</td>
+<td>↓ (Verkauf für Margin)</td>
+<td>↓ bei steigenden Realzinsen</td>
+<td>↑↑</td>
+</tr>
+<tr>
+<td>Inflationsschutz: Öl, Industriemetalle</td>
+<td>MCL, Micro-Kupfer</td>
+<td>↓</td>
+<td>↓↓</td>
+<td>↑</td>
+<td>↓</td>
+</tr>
+<tr>
+<td>Liquidität</td>
+<td>T-Bills, Geldmarkt</td>
+<td>flach</td>
+<td>einziger Gewinner</td>
+<td>↑ (Zins)</td>
+<td>flach</td>
+</tr>
+</tbody>
+</table></div>
+<p>Jeder Hafen hat ein dokumentiertes Versagensmuster, und darin liegt die Falle eines starren Systems. Sichere Häfen sind Rettungsboote, deren Seetüchtigkeit vom Wetter abhängt:</p>
+<ul>
+<li><strong>März 2020 („Dash for Cash“):</strong> Gold fiel um <strong>12 %</strong>, und die Geld-Brief-Spannen bei US-Anleihen verzehnfachten sich (<a href="https://www.bis.org/review/r220210f.htm">Cunliffe/BIS</a>). Der Dollar legte binnen anderthalb Wochen 7–12 % zu (<a href="https://www.dallasfed.org/research/economics/2024/0521">Dallas Fed</a>).</li>
+<li><strong>April 2025:</strong> Dollar und lange Treasuries fielen gemeinsam, „das Gegenteil dessen, was in einem Risk-off-Umfeld üblicherweise passiert“ (<a href="https://www.ecb.europa.eu/press/financial-stability-publications/fsr/special/html/ecb.fsrart202511_01~fdf147a04a.en.html">EZB</a>). Zweijährige Treasuries funktionierten weiter (<a href="https://www.robeco.com/en-uk/insights/2025/10/what-to-do-when-safe-havens-turn-into-stormy-waters">Robeco</a>), und Gold übernahm die Absicherungsrolle der langen Anleihen (<a href="https://www.nber.org/index%2ephp/digest/us-treasury-bonds-and-trade-policy-uncertainty">NBER Digest</a>).</li>
+<li><strong>2026:</strong> Gold war inzwischen ein überfüllter, gehebelter Momentum-Trade. Es fiel am 30. Januar um 11,4 % (<a href="https://finance.yahoo.com/news/silver-gold-tumble-triggers-major-183300200.html">Yahoo Finance</a>) und im März um 12 %, laut World Gold Council vor allem durch Zwangsliquidationen (<a href="https://gulfnews.com/amp/story/business%2Fretail%2Fwhat-triggered-golds-march-fall-and-why-april-looks-different-1.500504903">Gulf News/WGC</a>). Am 23. September fielen Nasdaq, Gold und Bitcoin bei einer zehnjährigen Rendite von 5,13 % gemeinsam, während der Dollar stieg (<a href="https://www.nbcnews.com/business/energy/treasury-yields-oil-stocks-rcna599398">NBC News</a>; <a href="https://www.investing.com/analysis/gold-selloff-shows-why-5-treasury-yields-are-the-bigger-threat-200688251">Investing.com</a>).</li>
+</ul>
+<p>Lag die Inflation über rund 3 %, war die Aktien-Anleihe-Korrelation historisch <strong>zu 98 % positiv</strong> (<a href="https://www.trustnet.com/news/13441497/higher-inflation-means-bonds-no-longer-protect-investors-when-stocks-fall">Trustnet/Invesco</a>). Dein System muss den Hafen deshalb aus dem Regime ableiten, statt ihn fest zu verdrahten. Als Euro-Anleger kommt für dich noch hinzu, dass Dollar-Häfen in US-zentrierten Schocks Währungsrisiko tragen. Die EZB schätzt, dass die Dollarschwäche 2025 die Treasury-Rendite für Euro-Investoren um etwa 5 Prozentpunkte gedrückt hat (<a href="https://www.ecb.europa.eu/press/financial-stability-publications/fsr/special/html/ecb.fsrart202511_01~fdf147a04a.en.html">EZB</a>).</p>
+<h3 id="haufig-ist-nicht-gleich-lukrativ">Häufig ist nicht gleich lukrativ</h3>
+<p>Rotationen gibt es reichlich. Der S&amp;P 500 fällt etwa zweimal im Jahr um mindestens 5 % und etwa alle 18 Monate um 10 % (<a href="https://www.capitalgroup.com/individual/planning/market-fluctuations/past-market-declines.html">Capital Group</a>). Allein für 2024 bis 2026 lassen sich ein Carry-Unwind (August 2024), ein Zollschock (April 2025), eine Krypto-Liquidationskaskade (Oktober 2025) sowie mehrere Öl-, Zins- und KI-Schocks 2026 datieren.</p>
+<p>Die eigene Klassifikation aller Handelstage seit 2007 anhand der Tagesrenditen von SPY, TLT, GLD, UUP und FXY zeigt aber, dass sich die Mischung verschoben hat (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/pattern_frequency_by_year.csv">eigene Berechnung: pattern_frequency_by_year.csv</a>):</p>
+<ul>
+<li><strong>Klassisches Risk-off</strong> (Aktien runter, Anleihen und Gold/Yen hoch): 2008 an 35 Tagen, <strong>seit 2021 nur noch 3–11 Tage pro Jahr</strong>.</li>
+<li><strong>Zins- und Inflationsschocks</strong> (Aktien und Anleihen fallen gemeinsam): früher 0–3 Tage, 2021–2023 dann 6–10 Tage pro Jahr.</li>
+<li><strong>Liquiditätsrallys</strong> (Aktien und Anleihen steigen, Dollar schwächer): von 1–10 auf <strong>11–25 Tage pro Jahr</strong>.</li>
+</ul>
+<figure class="chart"><figcaption><b>Wie oft kommt welche Rotation vor?</b>
+<span>Tage pro Jahr je Muster, klassifiziert aus Tagesrenditen von S&amp;P 500, Treasuries, Gold, US-Dollar und Yen (ETF-Daten 2007 bis 9. Oktober 2026).</span></figcaption>
+<div class="chartbox"><canvas id="c-patterns" role="img" aria-label="Linienchart: Häufigkeit der Rotationsmuster pro Jahr"></canvas></div>
+<details class="data"><summary>Daten als Tabelle</summary><div class="tablewrap" id="t-patterns"></div></details></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader, <code>results/daily/</code>). Das klassische Risk-off ist seltener geworden, gleichgerichtete Aktien-Anleihe-Bewegungen sind häufiger.</em></p>
+<p>Noch aufschlussreicher ist, was am Tag danach passiert (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/pattern_followthrough.csv">eigene Berechnung: pattern_followthrough.csv</a>):</p>
+<ul>
+<li><strong>Nach einem klassischen Risk-off-Tag (n = 282):</strong> Der S&amp;P 500 erholt sich im Mittel um 0,19 % (t = 1,9). T-Bonds (−0,15 %, t = −2,2) und Yen (−0,10 %, t = −2,2) geben einen Teil ihres Gewinns ab. Die Rotation kehrt also um.</li>
+<li><strong>Nach einem Zins- und Inflationsschock (n = 57):</strong> Die Rotation läuft weiter. Der Dollar steigt um weitere 0,14 % (t = 2,7), Bitcoin verliert im Schnitt 0,98 % am Folgetag und 2,5 % über fünf Tage.</li>
+<li><strong>Nach „Sell America“-Tagen:</strong> Aktien springen um 0,9–1,2 % zurück. Das beruht aber auf nur 25 Fällen seit 2007; Musterbeispiel ist der 9. April 2025.</li>
+</ul>
+<p>Das passt zum Befund aus der Literatur: Liquiditätsgetriebene Panik kehrt um, ein Regimewechsel bei Zinsen und Inflation setzt sich fort.</p>
+<figure class="chart"><figcaption><b>Was passiert am Tag nach einer Rotation?</b>
+<span>Mittlere Rendite am Folgetag in %, 2007–2026. * = statistisch signifikant (|t| ≥ 1,96). Feld berühren oder überfahren für den t-Wert.</span></figcaption>
+<div class="legend-div">negativ <i></i> positiv</div>
+<div class="tablewrap" id="h-follow"></div></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader, <code>results/daily/</code>). Blau: Fortsetzung oder Erholung am Folgetag, rot: Verlust.</em></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Rotation</th>
+<th>Typischer Auslöser</th>
+<th>Dauer des Impulses</th>
+<th>Häufigkeit</th>
+<th>Handelbarkeit für dich (Einschätzung)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risk-off (Wachstumsschreck)</td>
+<td>schwache Daten, Bankstress, KI-Zweifel</td>
+<td>1–5 Tage, Kern am ersten Tag</td>
+<td>mehrmals pro Jahr</td>
+<td>als Folger nein; Gegenhalten nach Übertreibung möglich</td>
+</tr>
+<tr>
+<td>Risk-on / Erleichterung</td>
+<td>Politikwende, Notenbankzusage</td>
+<td>Stunden bis Tage</td>
+<td>nach jedem größeren Schock</td>
+<td>ja: Aktienindex-Futures 4–8 h (eigener Befund)</td>
+</tr>
+<tr>
+<td>Dash for Cash</td>
+<td>Margin- und Finanzierungsstress</td>
+<td>1–2 Wochen</td>
+<td>selten (2008, 2020)</td>
+<td>nur Dollar/Cash, sonst Finger weg</td>
+</tr>
+<tr>
+<td>Zins-/Inflationsschock</td>
+<td>heiße CPI-/NFP-/PMI-Daten, Ölschock</td>
+<td>einzelne Tage in monatelangem Regime</td>
+<td>2022 und 2026 gehäuft</td>
+<td>ja, aber auf Tages- und Wochenbasis (Trend)</td>
+</tr>
+<tr>
+<td>US-Politikschock</td>
+<td>Zölle, Zweifel an Fed-Unabhängigkeit</td>
+<td>3–7 Tage bis zur Kehrtwende</td>
+<td>2025</td>
+<td>Gegenhalten am Folgetag, kleine Fallzahl</td>
+</tr>
+<tr>
+<td>Carry-Unwind</td>
+<td>BoJ-Überraschung, VIX-Sprung</td>
+<td>2–5 Handelstage</td>
+<td>2008, 2015/16, Aug. 2024</td>
+<td>Yen long kurzfristig, hohes Umkehrrisiko</td>
+</tr>
+<tr>
+<td>Krypto-Hebelkaskade</td>
+<td>Wochenend-Schlagzeile, Funding-Extreme</td>
+<td>Minuten bis Stunden</td>
+<td>mehrmals jährlich</td>
+<td>eher Gegenhalten; Börsen- und API-Risiko</td>
+</tr>
+<tr>
+<td>Monatsend-Rebalancing, Pre-FOMC</td>
+<td>Kalender</td>
+<td>1–2 Tage</td>
+<td>monatlich bzw. 8-mal jährlich</td>
+<td>dokumentiert, Verfall ungeprüft</td>
+</tr>
+</tbody>
+</table></div>
+<p>Dauern und Häufigkeiten stützen sich auf die Fallstudien von <a href="https://www.bis.org/publ/bisbull90.pdf">BIS</a>, <a href="https://www.fsb.org/uploads/P171120-2.pdf">FSB</a> und <a href="https://www.ecb.europa.eu/press/financial-stability-publications/fsr/special/html/ecb.fsrart202511_01~fdf147a04a.en.html">EZB</a> sowie auf die eigene Tagesklassifikation. Die Spalte zur Handelbarkeit ist meine Einschätzung auf Basis der eigenen Backtests.</p>
+<p>Welche Rotationen lohnen sich besonders? Die Belege ordnen sich klar nach Horizont:</p>
+<ul>
+<li><strong>Wochen bis Monate:</strong> Am stärksten ist langsames Cross-Asset-Momentum, das Regimewechsel bei Zinsen, Dollar und Rohstoffen erntet. 2026 ist dafür das Lehrbuchbeispiel mit short Anleihen, long Öl und long Dollar (<a href="https://hedgeco.net/news/?p=92151">HedgeCo</a>).</li>
+<li><strong>Kalender:</strong> Monatsend-Rebalancing (rund 17 bp Folgetagseffekt, <a href="https://www.nber.org/papers/w33554">NBER</a>) und die Pre-FOMC-Drift (je nach Messung 33–49 bp in den 24 Stunden vor der Zinsentscheidung, <a href="https://libertystreeteconomics.newyorkfed.org/2012/07/the-puzzling-pre-fomc-announcement-drift">NY Fed</a>; <a href="https://voxeu.org/article/predictable-movements-asset-prices-around-fomc-meetings">VoxEU</a>) sind dokumentiert. Ob sie nach ihrer Veröffentlichung fortbestehen, ist ungeprüft.</li>
+<li><strong>Intraday:</strong> In der eigenen Simulation zahlt nur eine Richtung, nämlich das Mitlaufen bei kräftigen Risk-on-Schüben in S&amp;P- und Nasdaq-Futures. Unter den Paaren schneiden die mit Yen oder Franken als Hafen relativ am besten ab, Anleihe gegen Anleihe und Schwellenländerwährungen am schlechtesten.</li>
+<li><strong>Swing:</strong> Die robustesten Paare waren Bitcoin gegen sichere Häfen (Netto-Sharpe 0,6–0,8) und Anleihen gegen Rohstoffe (0,5–0,6), also langsame Trends, keine schnellen Rotationen (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/pair_matrix_daily.csv">eigene Berechnung: pair_matrix_daily.csv</a>).</li>
+</ul>
+<p>Am wenigsten lohnen sich „Gold kaufen nach Risk-off“, Sektorrotation nach Konjunktur und die Folklore der Altcoin-Saison, für die es keinen belastbaren Test gibt (<a href="https://www.blockscholes.com/research/bybit-x-block-scholes-quarterly-report-altcoin-season-and-the-evolving-role-of-bitcoin">Block Scholes</a>).</p>
+<h2 id="900-varianten-kein-gewinner-was-die-eigene-simulation-zeigt">900 Varianten, kein Gewinner: Was die eigene Simulation zeigt</h2>
+<p>Alle Zahlen dieses Abschnitts sind <strong>eigene Berechnungen</strong> aus dem Repository MF_Trader, keine externen Quellen. Der Code liegt in <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/mf_trader/"><code>mf_trader/</code></a> und <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/scripts/"><code>scripts/</code></a>, die Rohergebnisse in <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/"><code>results/hourly/</code></a> und <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/"><code>results/daily/</code></a>. Alle Werte gelten nach Kosten, sofern nicht „brutto“ dasteht.</p>
+<h3 id="versuchsaufbau-17-markte-sieben-jahre-stundentakt">Versuchsaufbau: 17 Märkte, sieben Jahre, Stundentakt</h3>
+<p>Das Universum umfasst 17 Instrumente mit festen Rollen:</p>
+<ul>
+<li><strong>Risiko:</strong> S&amp;P 500, Nasdaq 100, DAX, Nikkei, Bitcoin, Ether, AUDJPY, USDMXN und Kupfer.</li>
+<li><strong>Häfen:</strong> US-T-Bond-Future, Bund-Future, Gold, Yen und Franken.</li>
+<li><strong>Ohne feste Rolle:</strong> Dollar-Index, Öl und Silber.</li>
+</ul>
+<p>Die Stundenkerzen stammen aus freien Quellen: HistData-Minutendaten, Dukascopy für Anleihe-Futures und Kupfer, Binance einschließlich Taker-Volumen. Sie reichen von Juli 2019 bis September 2026. In-Sample ist der Zeitraum bis Ende 2022, Out-of-Sample der ab 2023.</p>
+<p>Gemessen wird der Fluss in drei Schritten:</p>
+<ol>
+<li><strong>Saisonal normierte Rendite:</strong> die Stundenrendite geteilt durch die Volatilität, die für diese Tagesstunde in den letzten 60 Tagen üblich war.</li>
+<li><strong>Flow-Score:</strong> diese Renditen, kumuliert über L Stunden.</li>
+<li><strong>RORO-Score:</strong> die Differenz der mittleren Flow-Scores von Risiko- und Hafen-Assets, rollierend standardisiert. Ein z-Wert von −2,5 über vier Stunden gilt als Risk-off-Rotation, +2,5 als Risk-on.</li>
+</ol>
+<p>Gehandelt wird so, wie ein Bot es realistisch könnte (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/mf_trader/backtest.py">Code: backtest.py</a>; <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/mf_trader/universe.py">universe.py</a>):</p>
+<ul>
+<li>Das Signal entsteht am Ende einer Stunde, ausgeführt wird zu Beginn der nächsten und nur bei offenem Markt.</li>
+<li>Die Kosten je Seite liegen zwischen 0,7 bp (Yen, Franken) und 6 bp (Ether), mit einem Stressaufschlag bis zum Faktor drei.</li>
+<li>Die Positionsgröße richtet sich nach der inversen Volatilität.</li>
+</ul>
+<p>Auf dem Weg dorthin tauchten vier Datenfallen auf, die für jeden Nachbau lehrreich sind (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/README.md">README</a>):</p>
+<ol>
+<li><strong>Zeitstempel:</strong> Die HistData-Zeitstempel sind entgegen der Dokumentation New Yorker Ortszeit mit Sommerzeit. Unkorrigiert erzeugte das einen Scheineffekt „Bitcoin führt den Nasdaq um eine Stunde“ mit einer Korrelation von 0,23. Korrigiert blieben 0,02.</li>
+<li><strong>Kontraktwechsel:</strong> Die Anleihe-Futures zeigten beim Rollen Kurslücken von 0,7–1,8 %, die per Back-Adjustment entfernt werden mussten.</li>
+<li><strong>Look-ahead:</strong> Der erste Tages-Backtest hatte eine Trefferquote von 100 %, ein klarer Blick in die Zukunft.</li>
+<li><strong>Einzelereignisse:</strong> Der US-Kupferzoll im Juli 2025 (+12,6 % und −18,8 % in je einer Stunde) oder ein fehlerhafter DAX-Feed dürfen keine „Rotation“ auslösen. Deshalb werden die Flow-Scores vor der Mittelung auf ±4 gekappt.</li>
+</ol>
+<p>Die Lehre daraus: Bei Cross-Asset-Systemen im Intraday-Bereich ist ein verblüffend gutes Ergebnis zuerst ein Verdacht auf einen Datenfehler.</p>
+<h3 id="die-ereignisstudie-wenn-die-anzeigetafel-blinkt-ist-der-zug-schon-abgefahren">Die Ereignisstudie: Wenn die Anzeigetafel blinkt, ist der Zug schon abgefahren</h3>
+<figure class="chart"><figcaption><b>Was nach dem Signal noch übrig ist</b>
+<span>Durchschnittlicher Kursverlauf um 528 Risk-off- bzw. 382 Risk-on-Signale (4-Stunden-Flow, z ≥ 2,5), 2019–2026. Links vom Signal die Bewegung, die zur Erkennung führte; rechts die Überrendite gegenüber der normalen Drift.</span></figcaption>
+<div class="seg" id="seg-event" role="group" aria-label="Signalrichtung"><button type="button" data-mode="riskoff" aria-pressed="true">Risk-off</button><button type="button" data-mode="riskon" aria-pressed="false">Risk-on</button></div>
+<div class="chartbox tall"><canvas id="c-event" role="img" aria-label="Linienchart: Kursverlauf relativ zum Signalzeitpunkt"></canvas></div>
+<details class="data"><summary>Daten als Tabelle (bps)</summary><p>Risk-off</p><div class="tablewrap" id="t-event-riskoff"></div><p>Risk-on</p><div class="tablewrap" id="t-event-riskon"></div></details></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader, <code>results/hourly/event_path_*.csv</code>). Links vom Strich liegt die Bewegung vor dem Signal, rechts das, was danach noch kommt (Überrendite gegenüber der normalen Drift).</em></p>
+<p>Die Ereignisstudie über 528 Risk-off- und 382 Risk-on-Signale beantwortet die Kernfrage (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/event_study.csv">eigene Berechnung: event_study.csv</a>).</p>
+<p>In den vier Stunden <strong>vor</strong> einem Risk-off-Signal fallen der Nasdaq um 89 bp, der Nikkei um 92, Bitcoin um 104 und Ether um 149 bp. Gleichzeitig steigen T-Bonds um 37, der Yen um 35 und Gold um 26 bp. Die Rotation ist also real, groß und in Echtzeit eindeutig erkennbar.</p>
+<p><strong>Nach</strong> dem Signal bleibt fast nichts übrig:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Überrendite nach 1 h</th>
+<th>4 h</th>
+<th>8 h</th>
+<th>24 h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nasdaq</td>
+<td>−1,0 bp</td>
+<td>+0,6 bp</td>
+<td>−0,1 bp</td>
+<td>+3,5 bp</td>
+</tr>
+<tr>
+<td>T-Bond</td>
+<td>+1,4 bp</td>
+<td>0,0 bp</td>
+<td>−1,6 bp</td>
+<td>−4,9 bp</td>
+</tr>
+<tr>
+<td>Gold</td>
+<td>−0,3 bp</td>
+<td>+0,7 bp</td>
+<td>+1,5 bp</td>
+<td>−4,1 bp</td>
+</tr>
+</tbody>
+</table></div>
+<p>Typisch sind <strong>0–3 bp Fortsetzung, also weniger als die 2–3 bp, die ein Round-Trip pro Bein kostet</strong>. Über 24 Stunden geben die Häfen nach, und die Risikoassets erholen sich. Nur sehr starke Signale (z ≥ 3) hinterlassen einen kleinen Rest, in Gold (+6,0 bp in 4 Stunden, t = 2,0) und im Bund (+4,0 bp, t = 2,1). Ist die 60-Tage-Korrelation von Aktien und Anleihen nicht negativ, wie im Inflationsregime seit 2022, funktionieren Anleihen als Ziel gar nicht.</p>
+<p>Bei Risk-on sieht es ganz anders aus. Nach starken Erleichterungsschüben (z ≥ 3, n = 165) laufen die Risikoassets in den folgenden vier Stunden weiter, während der Bund weiter fällt:</p>
+<ul>
+<li>S&amp;P 500: +12,5 bp</li>
+<li>Nasdaq: +17,0 bp (t = 3,1)</li>
+<li>DAX: +13,0 bp</li>
+<li>Bitcoin: +24,4 bp</li>
+<li>Bund: −3,6 bp (t = −2,5)</li>
+</ul>
+<p>Panik ist ein Sprint, Erleichterung ein Mittelstreckenlauf. Wer bei der Angst einsteigt, kommt ins Ziel, wenn die anderen schon verschnaufen. Wer einsteigt, wenn die Zuversicht zurückkehrt, hat noch ein paar Runden vor sich.</p>
+<h3 id="strategien-nach-kosten-das-aufspringen-verliert-systematisch">Strategien nach Kosten: Das Aufspringen verliert systematisch</h3>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Strategie (intraday)</th>
+<th>Sharpe IS</th>
+<th>Sharpe OOS</th>
+<th>Sharpe gesamt</th>
+<th>Trades/Jahr</th>
+<th>Ø Trade netto (bp)</th>
+<th>Trefferquote</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rotation Follower Basis (Ziel long, 4 h, z ≥ 2,5, max. 8 h)</td>
+<td>−1,18</td>
+<td>−0,28</td>
+<td>−0,71</td>
+<td>104</td>
+<td>−0,6</td>
+<td>43 %</td>
+</tr>
+<tr>
+<td>… plus Short der Quell-Assets</td>
+<td>−1,43</td>
+<td>−0,45</td>
+<td>−0,96</td>
+<td>104</td>
+<td>−2,1</td>
+<td>38 %</td>
+</tr>
+<tr>
+<td>… nur Risk-off</td>
+<td>−0,99</td>
+<td>−0,25</td>
+<td>−0,61</td>
+<td>59</td>
+<td>−0,8</td>
+<td>40 %</td>
+</tr>
+<tr>
+<td>… nur Risk-on</td>
+<td>−0,62</td>
+<td>−0,25</td>
+<td>−0,42</td>
+<td>46</td>
+<td>−0,4</td>
+<td>48 %</td>
+</tr>
+<tr>
+<td><strong>Deine Idee: Risk-off → Gold + T-Bonds long, BTC + Nasdaq short</strong></td>
+<td>−0,58</td>
+<td>−0,45</td>
+<td>−0,51</td>
+<td>60</td>
+<td>−0,3</td>
+<td>40 %</td>
+</tr>
+<tr>
+<td>… plus Tages-RORO-Trendfilter</td>
+<td>−1,08</td>
+<td>−0,08</td>
+<td>−0,57</td>
+<td>51</td>
+<td>−0,9</td>
+<td>43 %</td>
+</tr>
+<tr>
+<td>… plus Hafen-Trendfilter</td>
+<td>−1,42</td>
+<td>−0,37</td>
+<td>−0,88</td>
+<td>90</td>
+<td>−1,3</td>
+<td>43 %</td>
+</tr>
+<tr>
+<td>… plus Aktien-Anleihe-Korrelationsfilter</td>
+<td>−0,84</td>
+<td>−0,26</td>
+<td>−0,56</td>
+<td>103</td>
+<td>−0,2</td>
+<td>43 %</td>
+</tr>
+<tr>
+<td>… nur US-Sitzung (Risk-off)</td>
+<td>−1,45</td>
+<td>−1,50</td>
+<td>−1,47</td>
+<td>23</td>
+<td>−6,1</td>
+<td>37 %</td>
+</tr>
+<tr>
+<td>Bestes von 900 Gitter-Setups (IS-Optimum)</td>
+<td>−0,29</td>
+<td>−0,40</td>
+<td>−0,34</td>
+<td>55</td>
+<td>+1,0</td>
+<td>46 %</td>
+</tr>
+<tr>
+<td><strong>Gegenhalten</strong> (z ≥ 3: 2 h warten, stärkste Verlierer kaufen, 24 h halten)</td>
+<td>+0,86</td>
+<td>+0,36</td>
+<td>+0,63</td>
+<td>28</td>
+<td>+11,5</td>
+<td>59 %</td>
+</tr>
+<tr>
+<td><strong>Risk-on-Momentum Aktienindex</strong> (z ≥ 3: S&amp;P + Nasdaq 4 h long)</td>
+<td>+0,36</td>
+<td>+1,62</td>
+<td>+1,02</td>
+<td>25</td>
+<td>+9,0</td>
+<td>61 %</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>Eigene Berechnung: <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/grid_rotation_follower.csv">grid_rotation_follower.csv</a>, <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/reference_strategies.csv">reference_strategies.csv</a>, <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/grid_fader.csv">grid_fader.csv</a>, <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/extra_equity_momentum_summary.json">extra_equity_momentum_summary.json</a>.</em></p>
+<figure class="chart"><figcaption><b>Intraday-Strategien nach Kosten</b>
+<span>Kumulierte Rendite bei 5 % Risikobudget je Positionsbein, Stundendaten Juli 2019 bis September 2026. Ab 2023 Out-of-Sample.</span></figcaption>
+<div class="chartbox tall"><canvas id="c-equity" role="img" aria-label="Linienchart: kumulierte Rendite der Strategien"></canvas></div>
+<details class="data"><summary>Daten als Tabelle</summary><div class="tablewrap" id="t-equity"></div></details></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader). Je Bein 5 % Risikobudget; rechts der gestrichelten Linie liegt der Out-of-Sample-Zeitraum.</em></p>
+<p>Das Urteil über das Aufspringen ist so eindeutig, wie Backtests selten sind. Getestet wurden 900 Parameterkombinationen: Fenster von 2, 4 und 8 Stunden, Schwellen z = 2, 2,5 und 3, Haltedauern von 4, 8 und 24 Stunden, verschiedene Ausstiegsregeln, mit und ohne Short-Bein, mit und ohne Glattstellung vor dem US-Schluss, dazu fünf Filter. <strong>Keine einzige Kombination hat im In-Sample eine positive Sharpe Ratio.</strong> Das Mittel liegt bei −1,72, das beste Setup bei −0,29, das Out-of-Sample-Mittel bei −0,46 (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/grid_rotation_follower.csv">eigene Berechnung: grid_rotation_follower.csv</a>).</p>
+<p>Brutto, also ohne Kosten, kommt der Basis-Follower auf eine Sharpe von +0,39 bei 1,2 bp pro Trade. Das Signal ist also echt, aber es ist ein Trinkgeld, während an jeder Mautstelle 2–3 bp pro Bein fällig werden. Das Short-Bein auf die Quell-Assets macht es schlimmer: Es verdoppelt die Kosten und verkauft genau in die Erholung hinein.</p>
+<p>Deine Ausgangsidee schlägt sich mit −0,51 noch vergleichsweise wacker. Auf 10 % Jahresvolatilität hochskaliert hieße das aber rund <strong>−5,5 % pro Jahr bei einem maximalen Drawdown von −36 %</strong> (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/scaled_10pct_vol.json">eigene Berechnung: scaled_10pct_vol.json</a>). Keiner der Filter rettet sie, und die Beschränkung auf US-Handelszeiten ist mit −1,47 die schlechteste Variante.</p>
+<p>Ein Placebo-Test zeigt sogar, dass das Signal schadet. Dafür wurde dieselbe Logik mit 200 zufälligen Einstiegszeitpunkten durchgerechnet. Der Folger in der US-Sitzung ist <strong>schlechter als 99 % dieser Zufallsvarianten</strong> (Placebo-Mittel −0,64), weil er systematisch nach Überreaktionen einsteigt (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/placebo_summary.json">eigene Berechnung: placebo_summary.json</a>).</p>
+<figure class="chart"><figcaption><b>Reaktionszeit und Kosten</b>
+<span>Sharpe Ratio des Rotation-Followers (Basisvariante) bei verzögertem Einstieg und unterschiedlichen Kostenannahmen.</span></figcaption>
+<div class="chartbox"><canvas id="c-latency" role="img" aria-label="Linienchart: Sharpe Ratio je Verzögerung"></canvas></div>
+<details class="data"><summary>Daten als Tabelle</summary><div class="tablewrap" id="t-latency"></div></details></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader, <code>results/hourly/latency_cost_sensitivity.csv</code>).</em></p>
+<p>Schneller reagieren hilft nicht, langsamer auch nicht. Schon eine bis zwei Stunden Verzögerung drücken die Brutto-Sharpe auf 0,05–0,08 und die Netto-Sharpe auf −1,1. Doppelte Kosten führen ohne Verzögerung auf −1,8 (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/latency_cost_sensitivity.csv">eigene Berechnung: latency_cost_sensitivity.csv</a>). Auffällig ist ein Buckel bei drei Stunden Verzögerung (brutto 0,78, netto −0,40). Vermutlich ist dann die erste Gegenbewegung vorbei. Aber auch dort bleibt nach Kosten ein Verlust, und bei so vielen getesteten Varianten ist ein einzelner Ausreißer eher Rauschen als Entdeckung. Reaktionen unter einer Stunde wurden nicht getestet. Die Literatur macht dafür aber wenig Hoffnung: Nachrichten sind in ein bis zwei Minuten eingepreist, und Vorläufe zwischen Märkten bestehen nur im Sekundenbereich. Ein Bot im Minutentakt wird gegen die Hochfrequenz kaum einen nennenswerten Rest erwischen.</p>
+<p>Zwei Ansätze drehen das Vorzeichen um, und beide verdienen ehrliche Fußnoten.</p>
+<p><strong>Gegenhalten.</strong> Nach einem starken Risk-off-Signal wartet die Regel zwei Stunden, kauft dann die größten Verlierer der Quellseite und hält sie 24 Stunden. Meist sind das AUDJPY, S&amp;P, Nikkei, DAX und Nasdaq. Das bringt eine Sharpe von 0,63 und schlägt 94,5 % der Zufallsvarianten (p ≈ 0,055). Die Einschränkungen (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/grid_fader.csv">eigene Berechnung: grid_fader.csv</a>):</p>
+<ul>
+<li>Über das gesamte Gitter von 144 Parameterkombinationen gemittelt ist die Sharpe negativ (−0,29 IS, −0,09 OOS).</li>
+<li>Robust ist nur die Variante „24 Stunden halten, ohne Absicherung“ (IS +0,33, OOS +0,31).</li>
+<li>Die fünf besten Trades liefern 46 % des Gewinns.</li>
+<li>Auf ein Spitzenjahr 2021 mit +13,2 % folgen seit 2023 nur magere 0,1–2,8 % pro Jahr.</li>
+</ul>
+<p><strong>Risk-on-Momentum im Aktienindex.</strong> Nach einem Risk-on-Signal mit z ≥ 3 kauft die Regel S&amp;P- und Nasdaq-Futures für vier Stunden. Sie erreicht eine <strong>Sharpe von 1,02</strong>, alle neun getesteten Varianten sind in beiden Perioden positiv, und keiner von 300 Placebo-Durchläufen kommt heran (95-%-Quantil 0,47) (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/extra_equity_momentum_placebo.json">eigene Berechnung: extra_equity_momentum_placebo.json</a>). Auch hier gibt es Einschränkungen:</p>
+<ul>
+<li>Die Regel wurde erst nach der Ereignisstudie formuliert, ist also nicht blind getestet.</li>
+<li>Im In-Sample allein ist sie mit t ≈ 0,7 nicht signifikant. Das Ergebnis lebt vom starken Zeitraum ab 2023 (2023 +3,5 %, 2024 +5,7 %).</li>
+<li>Sie ist nur rund 100 Stunden im Jahr investiert. Skaliert auf 10 % Jahresvolatilität (CAGR rund 10 %, maximaler Drawdown −14 %) braucht sie deshalb etwa den fünffachen Hebel der Basis. In den wenigen Stunden im Markt steht also ein Vielfaches des Kontos im Feuer (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/extra_equity_momentum_summary.json">eigene Berechnung: extra_equity_momentum_summary.json</a>; <a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/scaled_10pct_vol.json">scaled_10pct_vol.json</a>).</li>
+</ul>
+<h3 id="paare-querschnitt-und-krypto-als-fruhwarnsystem-bestatigen-das-bild">Paare, Querschnitt und Krypto als Frühwarnsystem bestätigen das Bild</h3>
+<figure class="chart"><figcaption><b>Paar-Rotationen intraday: Sharpe nach Kosten</b>
+<span>„Folge dem Flow von B nach A“ mit 8-Stunden-Fenster und 8 Stunden Haltedauer, 136 Paare. Feld berühren oder überfahren für Brutto- und Out-of-Sample-Werte.</span></figcaption>
+<div class="legend-div">Folgen verliert <i></i> Folgen lohnt</div>
+<div class="tablewrap" id="h-pairs"></div></figure>
+<p><em>Eigene Berechnung (Repo MF_Trader, <code>results/hourly/pair_matrix.csv</code>). Gezeigt ist die Sharpe nach Kosten, wenn man dem Paar-Fluss acht Stunden folgt. Blau: Folgen lohnt, rot: Folgen verliert.</em></p>
+<p>Die Paar-Matrix prüft für alle 136 Paare, ob es sich lohnt, dem Fluss von B nach A zu folgen (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/pair_matrix.csv">eigene Berechnung: pair_matrix.csv</a>):</p>
+<ul>
+<li>Netto sind bei vier Stunden Haltedauer nur 1 % der Paare positiv, bei acht Stunden 10 %.</li>
+<li>Kein einziges Paar ist bei vier Stunden in In- und Out-of-Sample positiv, bei acht Stunden sind es 5 von 136.</li>
+<li>Am besten schneidet Gold gegen Yen ab (8 Stunden, netto 0,41, OOS 0,73), gefolgt von Yen gegen Silber und AUDJPY gegen Yen.</li>
+<li>Am schlechtesten sind Bund gegen T-Bond (−2,5) und alle Peso-Paare.</li>
+</ul>
+<p>Bemerkenswert ist, wie stabil die Rangfolge ist (Korrelation zwischen IS und OOS 0,48–0,66). Paare mit Yen oder Franken als Hafen funktionieren relativ am besten, wohlgemerkt relativ, in einem Meer aus Rot.</p>
+<p>Zwei weitere Tests bestätigen das Bild:</p>
+<ul>
+<li><strong>Querschnitts-Momentum:</strong> Stündlich die stärksten Zuflüsse long und die stärksten Abflüsse short zu nehmen, bringt bei einer Stunde Fenster brutto eine Sharpe von etwa −2. Das ist ein Zeichen kräftiger kurzfristiger Umkehr. Bei 24 Stunden Fenster sind es brutto bis +0,69, netto aber durchweg negativ.</li>
+<li><strong>Intraday-Momentum der letzten Stunde</strong> nach Gao und Baltussen: 2019–2026 brutto nur schwach (Nasdaq 0,43, Gold 0,79, S&amp;P 0,13), netto überall negativ (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/intraday_momentum_last_hour.csv">eigene Berechnung: intraday_momentum_last_hour.csv</a>). Gemessen wurde allerdings auf Stunden- statt auf Halbstundenbasis, was dem Original nicht ganz gerecht wird.</li>
+</ul>
+<p>Auch Bitcoin als Frühwarnsystem rund um die Uhr enttäuscht (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/hourly/crypto_extras.json">eigene Berechnung: crypto_extras.json</a>):</p>
+<ul>
+<li>Die Wochenendrendite korreliert mit der Nasdaq-Eröffnungslücke am Sonntagabend zu 0,20. Das ist nicht handelbar, weil die Futures erst dann öffnen.</li>
+<li>Mit dem Rest des Montags korreliert sie zu −0,13, kehrt also leicht um.</li>
+<li>Für die nächste Nasdaq-Stunde hat Bitcoin eine Vorhersagekraft von 0,02. In umgekehrter Richtung sind es 0,07.</li>
+</ul>
+<p>Das deckt sich mit Kaiko-Daten, nach denen der Wochenendanteil am Bitcoin-Volumen von 24 % (2018) auf 13 % (Anfang 2024) gefallen ist (<a href="https://www.theblock.co/news/markets/2024-02-27-bitcoin-weekend-trading-279353">The Block</a>). Es passt auch zu den Fallstudien: Krypto lief einmal voraus (August 2024) und hinkte einmal hinterher (Oktober 2025) (<a href="https://coindesk.com/markets/2024/08/05/crypto-futures-witness-840m-in-liquidations-as-bitcoin-nosedives-ether-records-biggest-fall-since-2021">CoinDesk</a>; <a href="https://www.bit.com/knowledge-hub/october-10-crypto-crash-binance-usde">bit.com</a>).</p>
+<h3 id="tagesdaten-als-referenz-langsam-schlagt-schnell">Tagesdaten als Referenz: langsam schlägt schnell</h3>
+<p>Auf Tagesbasis (ETF-Daten 2007–2026) wiederholt sich das Muster eine Etage höher. Ein Rotation Follower mit 1–20 Tagen Haltedauer kommt über 480 Varianten im Mittel auf −0,29 (IS) und −0,03 (OOS). Ein Einstieg einen Tag nach dem Signal ist besser als am Signaltag, weil die erste Bewegung umkehrt (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/grid_rotation_follower_daily.csv">eigene Berechnung: grid_rotation_follower_daily.csv</a>).</p>
+<p>Klassisches Cross-Asset-Momentum schneidet dagegen gut ab. Die Regel ordnet die Anlageklassen nach ihrer 60- bis 250-Tage-Rendite, hält die besten drei bis fünf long und schichtet wöchentlich oder monatlich um. Sie erreicht eine <strong>Sharpe von 0,63–0,72 im In-Sample und 0,70–0,78 im Out-of-Sample</strong> bei 10–12 % jährlicher Rendite und einem maximalen Drawdown von −32 bis −35 % (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/grid_xs_momentum_daily.csv">eigene Berechnung: grid_xs_momentum_daily.csv</a>). Ehrlich eingeordnet ist das kaum mehr Sharpe als schlichtes Halten von QQQ (0,79), aber mit deutlich flacherem Tal: QQQ fiel zwischenzeitlich um 53 %, SPY um 55 % (<a href="https://github.com/Winni4438/MF_Trader/blob/claude/blissful-gates-12gd63/results/daily/buy_and_hold.json">eigene Berechnung: buy_and_hold.json</a>). Die Long/Short-Variante fällt auf 0,3–0,4. Cross-Asset-Momentum ist damit eine Drawdown-Bremse mit Marktrendite, keine Wundermaschine. Und es ist genau die Form von Money-Flow-Trading, die Profis tatsächlich betreiben.</p>
+<p>Die eigene Studie hat natürlich Grenzen:</p>
+<ul>
+<li>Sieben Jahre Stundendaten enthalten nur wenige wirklich große Ereignisse.</li>
+<li>Freie Daten haben bekannte Macken; der DAX-Feed lieferte 2020–2023 Euro-Stoxx-Niveaus.</li>
+<li>Die Kostenannahmen dürften für echte Stressmomente optimistisch sein. Im März 2020 brach die Markttiefe im ES-Future um rund 90 % ein (<a href="https://www.cmegroup.com/education/articles-and-reports/assessing-liquidity.html">CME</a>).</li>
+<li>Für die beiden positiven Ansätze besteht das Risiko, dass sie Zufallsfunde aus vielen Tests sind (Data-Snooping).</li>
+</ul>
+<p>Gerade deshalb ist der negative Befund belastbarer als die Höhe der positiven. Ein Signal, das in 900 von 900 Varianten verliert, wird durch bessere Daten nicht profitabel.</p>
+<h2 id="was-sich-lohnt-ein-langsamer-kern-zwei-kleine-satelliten-und-ein-stressschalter">Was sich lohnt: ein langsamer Kern, zwei kleine Satelliten und ein Stressschalter</h2>
+<h3 id="ehrliche-bilanz-weiterverfolgen-oder-begraben">Ehrliche Bilanz: weiterverfolgen oder begraben</h3>
+<p>Aus Literatur und eigenem Backtest ergibt sich eine klare Sortierung:</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Idee</th>
+<th>Urteil</th>
+<th>Kernbegründung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intraday-Rotation-Follower (Ziel long, optional Quelle short)</td>
+<td><strong>begraben</strong></td>
+<td>900 von 900 Varianten im IS negativ; schlechter als zufällige Einstiege; 62 % der Fluchtbewegungen sind nach einem Tag vorbei</td>
+</tr>
+<tr>
+<td>Deine Ausgangsidee (Risk-off: Gold + T-Bonds long, BTC + Nasdaq short)</td>
+<td><strong>begraben</strong></td>
+<td>Sharpe −0,51; bei 10 % Volatilität −5,5 % pro Jahr, maximaler Drawdown −36 %; T-Bonds sind im Inflationsregime kein Hafen</td>
+</tr>
+<tr>
+<td>Tägliches/wöchentliches Cross-Asset-Momentum mit Regimefilter</td>
+<td><strong>weiterverfolgen, als Kern</strong></td>
+<td>eigene OOS-Sharpe 0,70–0,78; jahrhundertelange Evidenz; CTA-Praxis, 2026 +16 %</td>
+</tr>
+<tr>
+<td>Risk-on-Momentum in S&amp;P- und Nasdaq-Futures (z ≥ 3, 4 h)</td>
+<td><strong>weiterverfolgen, als Satellit im Vorwärtstest</strong></td>
+<td>Sharpe 1,02, besser als alle Placebos; aber nachträglich formuliert und im IS nicht signifikant</td>
+</tr>
+<tr>
+<td>Gegenhalten nach Panik (z ≥ 3, 24 h)</td>
+<td><strong>beobachten, als kleinster Satellit</strong></td>
+<td>Sharpe 0,63, p ≈ 0,055; Gewinn auf wenige Trades konzentriert; Gittermittel negativ</td>
+</tr>
+<tr>
+<td>Bitcoin gegen sichere Häfen über 20–60 Tage</td>
+<td><strong>weiterverfolgen, als Swing-Ergänzung</strong></td>
+<td>netto 0,6–0,8 in IS und OOS</td>
+</tr>
+<tr>
+<td>Flow-Detektor</td>
+<td><strong>umbauen</strong>: vom Einstiegssignal zum Auslöser und Stressschalter</td>
+<td>erkennt Rotationen zuverlässig; sein Wert liegt im Bremsen und im Auslösen der Gegenbewegungsmodule</td>
+</tr>
+<tr>
+<td>Gemeldete Flüsse (ETF, COT, EPFR), MFI/CMF/OBV, BTC als Frühindikator, bezahlte On-Chain-Daten für Intraday</td>
+<td><strong>nicht für Intraday</strong></td>
+<td>zu spät, zu schwach oder in eigenen Tests ohne Prognosekraft</td>
+</tr>
+</tbody>
+</table></div>
+<p>Der Flow-Detektor verliert damit nicht seinen Wert, er bekommt nur eine neue Aufgabe. Statt „Zug fährt ab, spring auf“ sagt er dir künftig drei Dinge:</p>
+<ol>
+<li><strong>„Jetzt nicht hinterherlaufen.“</strong> Neue Einstiege in Richtung einer gerade erkannten Panik werden gesperrt.</li>
+<li><strong>„Stressmodus.“</strong> Kleinere Positionen und Limit- statt Marktorders. Im März 2020 brach die Markttiefe im ES-Future um rund 90 % ein (<a href="https://www.cmegroup.com/education/articles-and-reports/assessing-liquidity.html">CME</a>), und im Oktober 2025 erreichten Krypto-Spreads zeitweise zweistellige Prozentwerte (<a href="https://fticonsulting.com/insights/articles/crypto-crash-october-2025-leverage-met-liquidity">FTI Consulting</a>).</li>
+<li><strong>„Gelegenheit.“</strong> Er löst die beiden Gegenbewegungsmodule aus.</li>
+</ol>
+<p>Zusätzlich wählt eine Regimeschicht den Hafen dynamisch. Ist die 60-Tage-Korrelation von Aktien und Anleihen positiv, fallen lange Anleihen als Ziel weg. Dann rücken kurze Laufzeiten, der Franken und Gold nach, Gold aber nur, solange die Realzinsen nicht steigen.</p>
+<h3 id="architektur-in-cnet-lean-als-ruckgrat-ibkr-als-gleis">Architektur in C#/.NET: LEAN als Rückgrat, IBKR als Gleis</h3>
+<p>Für dich als C#-Entwickler ist QuantConnect LEAN die naheliegende Wahl. LEAN ist eine quelloffene C#-Engine, in der Backtest und Live-Handel denselben Code nutzen, und hat eine fertige Interactive-Brokers-Anbindung. Die Spielregeln dafür sind klar dokumentiert (<a href="https://www.quantconnect.com/docs/v2/cloud-platform/live-trading/brokerages/interactive-brokers">QuantConnect</a>):</p>
+<ul>
+<li>Du brauchst ein <strong>IBKR-Pro-Konto</strong> (nicht Lite) mit IB-Key-Zwei-Faktor-Authentifizierung.</li>
+<li>Die <strong>wöchentliche Re-Authentifizierung</strong> kommt sonntags. Bestätigst du sie nicht, stoppt der Algorithmus vor Marktöffnung.</li>
+<li><strong>Pro IBKR-Benutzer ist nur eine Verbindung erlaubt.</strong> Für TWS daneben brauchst du einen zweiten Benutzer.</li>
+<li>Die <strong>FIX-Anbindung</strong> in der QuantConnect-Cloud bleibt dauerhaft verbunden und erspart das wöchentliche Login. Für Papierkonten gilt sie nicht.</li>
+</ul>
+<p>Als EU-Privatkunde darfst du keine US-ETFs kaufen, weil ihnen das nach PRIIPs vorgeschriebene Basisinformationsblatt (KID) fehlt. Futures und CFDs sind erlaubt (<a href="https://ibkb.interactivebrokers.com/de/node/3324">IBKR</a>). Wer lieber direkt gegen die TWS-API programmiert, sollte wissen, dass deren C#-Quellen DLL-basiert und nicht Teil der Mac/Unix-Distribution sind (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/notes-limitations/tws-api-limitations">IBKR</a>). Das heißt praktisch: Windows-VPS, IB Gateway mit Auto-Restart und kein Ruhezustand, denn der trennt die API (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/architecture/the-trader-workstation/the-ib-gateway">IBKR</a>).</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Schicht</th>
+<th>Aufgabe</th>
+<th>Umsetzung (Vorschlag)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Live-Daten</td>
+<td>Futures-, FX- und Indexkurse</td>
+<td>LEAN-IB-Feed; CME/CBOT/COMEX-L1 je 1,55 USD/Monat, Eurex-L1 frei; FX über IdealPro</td>
+</tr>
+<tr>
+<td>Krypto-Daten</td>
+<td>Taker-Volumen, Funding, Liquidationen</td>
+<td>eigene Custom-Data-Klasse für Binance-WebSocket und -REST; nicht aus Rechenzentren betreiben, die HTTP 451 bekommen</td>
+</tr>
+<tr>
+<td>Historie</td>
+<td>Backtests, Kalibrierung</td>
+<td>vorhandene HistData-, Dukascopy- und Binance-Stundenkerzen ins LEAN-Format importieren; ab dem ersten Tag eigene Live-Daten mitschreiben</td>
+</tr>
+<tr>
+<td>Regime (täglich)</td>
+<td>Hafenwahl, Risikobudget</td>
+<td>60-Tage-Korrelation Aktien/Anleihen, 60–250-Tage-Momentum, Tages-RORO; KC-Fed-RORO und OFR-FSI als Plausibilitätskontrolle</td>
+</tr>
+<tr>
+<td>Flow-Detektor (stündlich)</td>
+<td>Rotation erkennen</td>
+<td>Port von <code>flow.py</code>: saisonal normierte Renditen, Flow-Score, RORO-z, Kappung auf ±4</td>
+</tr>
+<tr>
+<td>Alpha-Module</td>
+<td>Signale</td>
+<td>je ein <code>AlphaModel</code> für Cross-Asset-Momentum, Risk-on-Index-Momentum und Gegenhalten</td>
+</tr>
+<tr>
+<td>Portfolio</td>
+<td>Positionsgrößen</td>
+<td>inverse Volatilität, festes Risikobudget je Modul, Netting gleicher Kontrakte über die Module</td>
+</tr>
+<tr>
+<td>Ausführung</td>
+<td>Orders</td>
+<td>marketable Limit-Orders, keine Einstiege in den ersten Minuten nach Makrodaten, Rollkalender je Kontrakt</td>
+</tr>
+<tr>
+<td>Risiko</td>
+<td>Schutz</td>
+<td>Tagesstopp (Crabels Contra arbeitet mit 2,5 %), Hebelobergrenze, Prüfung der Overnight-Margin vor dem Cutoff, Gap-Szenarien, Kill-Switch</td>
+</tr>
+<tr>
+<td>Betrieb</td>
+<td>Verfügbarkeit</td>
+<td>QuantConnect-Cloud mit FIX oder lokal mit IB Gateway + IBC; Watchdog, Push-Alarme, Trade-Journal</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bei den Instrumenten führt kein Weg an Futures vorbei:</p>
+<ul>
+<li><strong>Aktienindizes:</strong> Ein ES-Kontrakt kostet bei IBKR 2,24 USD je Seite einschließlich Börsengebühr (<a href="https://www.interactivebrokers.com/en/pricing/commissions-futures.php">IBKR</a>). Bei rund 335.000 USD Kontraktwert und einem Tick Spread sind das grob 0,5 bp pro Round-Trip, ein Bruchteil der Kryptokosten.</li>
+<li><strong>Micros für dein Konto:</strong> Bei 50–250 k€ sind die Micros das richtige Werkzeug, weil sie feine Positionsgrößen erlauben. Für US-Aktien gibt es MES und MNQ (0,25 USD Kommission plus Börsengebühr), an der Eurex Micro-DAX (0,38 EUR), dazu Micro-Gold, Micro-WTI und Micro-Futures auf die 10-Jahres-Rendite.</li>
+<li><strong>Yen und Franken:</strong> Einen Micro-Yen-Future führt IBKR nicht. Yen und Franken laufen daher über den vollen 6J-Kontrakt oder über Spot-FX via IdealPro (<a href="https://www.interactivebrokers.com/en/trading/micro-futures-comparison.php">IBKR Micro-Futures</a>).</li>
+<li><strong>Bitcoin:</strong> Der Micro-Bitcoin-Future MBT kostet allein an Kommission rund 2,2 bp pro Round-Trip, der volle BTC-Kontrakt etwa ein Achtel davon. Kraken-Spot mit 0,80 % Taker-Gebühr pro Seite ist für Intraday-Rotation völlig ungeeignet (<a href="https://www.kraken.com/features/fee-schedule">Kraken</a>). Seit dem 29. Mai 2026 handelt die CME Krypto-Futures rund um die Uhr, das bringt Bitcoin unter das IBKR-Dach (<a href="https://www.marketsmedia.com/cme-launches-24-7-crypto-futures-options-trading/">Markets Media</a>).</li>
+</ul>
+<p>Plane Übernachtpositionen bewusst. IBKR hebt die Margin vor Handelsschluss auf das Overnight-Niveau und stellt glatt, wenn sie nicht gedeckt ist (<a href="https://www.interactivebrokers.com/campus/trading-lessons/tws-margin-for-futures/">IBKR Campus</a>). US-Aktienindex-Futures haben über Nacht ein Limit von ±7 % und Pausen ab 3,5 % (<a href="https://www.cmegroup.com/trading/equity-index/faq-us-based-equity-index-price-limits.html.html">CME</a>). Ein Short kann deshalb in einer Limit-up-Erholung festhängen.</p>
+<p>Steuerlich ist die Lage seit Ende 2024 freundlicher. Das Jahressteuergesetz 2024 hat die 20.000-Euro-Grenze für die Verrechnung von Verlusten aus Termingeschäften abgeschafft. Verluste aus Futures und CFDs sind wieder voll mit Kapitalerträgen verrechenbar (<a href="https://www.vlh.de/kaufen-investieren/geldanlage/verluste-aus-termingeschaeften-das-aendert-sich.html">VLH</a>; <a href="https://www.gtkp.de/aktuelles/2024-12-11-bundesrat-ermoeglicht-vollstaendige-verlustverrechnung-bei-termingeschaeften-676.html">GTKP</a>). Krypto-Spot fällt dagegen unter § 23 EStG mit einjähriger Haltefrist und eigenem Verlusttopf (<a href="https://www.gesetze-im-internet.de/estg/__23.html">§ 23 EStG</a>). CME-Bitcoin-Futures dürften als Termingeschäfte unter die Abgeltungsteuer fallen; das solltest du mit einem Steuerberater klären. CFDs sind für Privatkunden auf Hebel zwischen 30:1 und 2:1 begrenzt (<a href="https://www.esma.europa.eu/node/84933">ESMA</a>).</p>
+<p>Zum Betrieb: Die API-Grenze von 50 Nachrichten pro Sekunde (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/pacing-limitations/introduction">IBKR</a>) ist für einen Stunden-Bot bedeutungslos. Entscheidend ist, wie stabil das System läuft und wie aussagekräftig der Papierhandel ist. IBKRs Paper-Fills beruhen auf „stärker simulierten Technologien“ und weichen vom Live-Handel ab (<a href="https://www.interactivebrokers.com/docs/tws-api/doc/notes-limitations/tws-api-limitations">IBKR</a>). Miss deine eigene Latenz vom Signal bis zur Ausführungsbestätigung, statt sie zu schätzen. Für Krypto-Beine gilt: Stop- und Take-Profit-Orders vorab direkt auf der Börse platzieren. Im Oktober 2025 froren Oberflächen ein, APIs wurden gedrosselt, und das Auto-Deleveraging der Börsen schloss profitable Shorts zwangsweise (<a href="https://fticonsulting.com/insights/articles/crypto-crash-october-2025-leverage-met-liquidity">FTI Consulting</a>; <a href="https://blog.bitmex.com/the-october-11-flash-crash">BitMEX</a>).</p>
+<h3 id="fahrplan-in-vier-etappen">Fahrplan in vier Etappen</h3>
+<p>Jede Etappe hat ein klares Abbruchkriterium, damit aus dem Projekt kein Fass ohne Boden wird. Die Zeitangaben sind Richtwerte, keine Erfahrungswerte.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Etappe</th>
+<th>Inhalt</th>
+<th>Richtwert</th>
+<th>Weiter nur, wenn …</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 – Fundament</td>
+<td>LEAN lokal aufsetzen, vorhandene Stundendaten importieren, Flow-Messung und Backtest-Logik nach C# portieren</td>
+<td>3–6 Wochen</td>
+<td>C# reproduziert die Python-Ergebnisse (Ereignisstudie, Basis-Follower) auf wenige Prozent genau</td>
+</tr>
+<tr>
+<td>1 – Kern</td>
+<td>tägliches Cross-Asset-Momentum mit Regimefilter auf Micro-Futures, erst Paper, dann klein live</td>
+<td>2–3 Monate</td>
+<td>Slippage, Rolls und Margin verhalten sich wie im Backtest</td>
+</tr>
+<tr>
+<td>2 – Satelliten</td>
+<td>Risk-on-Index-Momentum und Gegenhalten mit vorab schriftlich fixierten Regeln im Vorwärtstest; Live-Daten mitschreiben</td>
+<td>6–12 Monate</td>
+<td>genug Trades (Größenordnung 25–50) und ein Netto-Ergebnis im Rahmen des Backtests, ohne nachträgliches Nachjustieren</td>
+</tr>
+<tr>
+<td>3 – Betrieb</td>
+<td>Kern voll, Satelliten mit kleinem Risikobudget; vierteljährliche Überprüfung</td>
+<td>fortlaufend</td>
+<td>Kill-Kriterien (Drawdown, Abweichung vom Backtest) nicht gerissen</td>
+</tr>
+</tbody>
+</table></div>
+<p>Die wichtigste Regel dieses Fahrplans ist psychologisch. Schreib die Regeln der Satelliten fest, bevor du sie live beobachtest, und widersteh der Versuchung, nach jedem Verlusttrade eine Schraube zu drehen. Bei nur rund 25 Signalen pro Jahr dauert es Jahre, bis ein Out-of-Sample-Ergebnis statistisch trägt. Das ist der Preis eines seltenen Signals, und deshalb gehört das Hauptrisikobudget in den langsamen Kern.</p>
+<h2 id="fazit">Fazit</h2>
+<p>Die vielleicht wichtigste Einsicht dieser Arbeit ist ein Paradox der Sichtbarkeit. Je deutlicher eine Rotation zu erkennen ist, desto sicherer ist sie bereits vorbei: alle Märkte im Gleichschritt, z-Wert über 2,5, Bitcoin und Nasdaq im Sturzflug, Yen und Anleihen gesucht. Die Erkennbarkeit selbst ist das Symptom der Erschöpfung. Das wertet den ganzen Ansatz um. Der Flow-Detektor ist kein Startsignal, sondern ein Thermometer, das Überhitzung anzeigt. Sein Ertrag liegt im Nicht-Handeln, im Gegenhalten und im Mitgehen, wenn die Zuversicht zurückkehrt. Der eigentlich neue Befund ist die Asymmetrie zwischen verpuffender Panik und nachlaufender Erleichterung. Sie passt zur Unterscheidung zwischen informationsarmen Liquiditätsschocks und informationsreichen Politikwenden, muss sich aber erst in einem echten Vorwärtstest bestätigen.</p>
+<p>Für dich als Retail-Trader verschiebt sich damit der Wettbewerbsvorteil. Er liegt nicht in der Geschwindigkeit, denn dort verlierst du gegen Häuser mit 15 Mikrosekunden Latenz. Er liegt in Horizont, Kostendisziplin und Regimeverständnis. Das Umfeld von 2026 belohnt Systeme, die den Hafen aus dem Regime ableiten, und bestraft fest verdrahtete Risk-off-Landkarten: Aktien und Anleihen bewegen sich gleichgerichtet, die Renditen liegen über 5 %, und Gold hat sich vom Hafen zum überfüllten Momentum-Trade gewandelt. Wer das baut, baut kein „Money-Flow-Scalping“, sondern einen kleinen, ehrlichen CTA. Nüchtern betrachtet ist das die einzige Form dieses Handelsstils, die sich über Jahrzehnte bewährt hat.</p>
+  </article>
+  <footer class="note">
+    Code, Daten-Pipeline und alle Rohergebnisse liegen im Repository <code>Winni4438/MF_Trader</code> (Branch <code>claude/blissful-gates-12gd63</code>): <code>mf_trader/</code>, <code>scripts/</code>, <code>results/</code>. Reine Forschung, keine Anlageberatung.
+  </footer>
+</div>
+<script id="chartdata" type="application/json">{"event_riskoff": {"x": [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48], "series": [{"key": "NDX", "name": "Nasdaq 100", "y": [98.1, 96.6, 93.8, 93.5, 89.6, 86.1, 85.1, 85.2, 89.7, 79.0, 62.9, 41.0, 0.0, -0.4, -0.3, 1.6, 1.6, 2.6, 3.0, 3.2, 1.1, -0.2, -2.8, -4.4, -1.6, -2.9, -2.0, -0.5, 0.9, 1.2, -0.1, -0.1, 1.1, 2.4, 2.4, 5.1, 4.9, 7.2, 8.9, 9.7, 9.2, 10.1, 9.5, 7.8, 8.9, 6.8, 5.8, 6.8, 4.9, 2.2, -0.2, -0.1, 2.6, 2.2, 3.5, 4.6, 2.9, 2.7, 3.0, 2.8, 3.2]}, {"key": "BTC", "name": "Bitcoin", "y": [113.6, 105.3, 103.3, 104.3, 103.4, 99.8, 97.9, 96.8, 103.6, 89.8, 70.6, 45.2, 0.0, -8.2, -11.5, -12.2, -4.4, 1.0, 1.7, -0.2, 1.1, -0.7, -7.1, -6.4, -6.1, -10.2, -6.4, -3.4, -5.6, -1.3, -4.2, -0.7, -2.7, 0.3, 6.0, 3.5, 5.6, 7.9, 13.7, 20.6, 16.1, 17.7, 14.4, 10.2, 4.7, 1.8, -3.4, -3.7, -3.6, -4.1, -4.4, -0.9, -0.9, -4.2, -4.1, 3.7, 6.9, -2.6, -0.4, -0.0, 1.6]}, {"key": "UST", "name": "US-Staatsanleihen 30J", "y": [-37.3, -36.3, -36.0, -35.4, -34.5, -33.1, -32.8, -33.2, -37.3, -31.5, -24.8, -16.1, 0.0, 1.4, 1.4, -0.2, -0.4, -0.8, -0.7, -1.3, -1.7, -1.5, -1.0, -1.2, -1.3, -2.1, -2.6, -2.6, -2.3, -2.4, -2.8, -2.4, -2.8, -2.9, -3.9, -5.4, -5.6, -5.2, -5.3, -5.6, -5.0, -4.7, -4.2, -4.5, -4.5, -4.6, -4.7, -5.2, -5.9, -6.0, -6.4, -6.4, -5.3, -5.0, -5.0, -4.4, -4.8, -4.6, -5.6, -5.6, -5.8]}, {"key": "GOLD", "name": "Gold", "y": [-24.4, -25.0, -23.6, -23.4, -23.6, -22.9, -22.9, -22.9, -25.2, -21.0, -17.5, -11.5, 0.0, -0.0, 1.0, 1.2, 1.1, 1.4, 2.0, 1.9, 2.5, 2.3, 1.2, -0.6, -0.4, -1.3, -1.6, 0.9, 2.1, 0.2, 0.2, 1.6, 1.2, 0.7, -1.8, -2.2, -3.4, -3.8, -4.5, -3.5, -3.3, -3.7, -3.5, -4.7, -5.0, -4.4, -4.5, -6.2, -7.7, -8.8, -8.4, -8.6, -7.9, -8.3, -9.0, -9.2, -8.7, -8.6, -8.5, -8.7, -8.3]}, {"key": "CHF", "name": "Schweizer Franken", "y": [-18.7, -18.1, -17.6, -18.3, -17.9, -16.2, -16.4, -16.4, -18.0, -15.4, -12.5, -7.8, 0.0, 1.2, 0.9, 0.6, 0.8, 1.6, 1.6, 2.5, 2.9, 3.7, 3.7, 3.6, 4.3, 4.1, 4.6, 5.5, 6.1, 6.2, 5.8, 5.5, 6.4, 6.3, 5.4, 5.7, 4.4, 4.8, 4.6, 4.8, 5.2, 5.3, 5.2, 4.5, 4.3, 4.5, 4.7, 4.7, 4.7, 4.6, 4.6, 4.9, 4.1, 4.8, 4.8, 5.2, 6.2, 6.2, 6.4, 6.5, 6.8]}, {"key": "JPY", "name": "Yen", "y": [-33.9, -33.3, -33.2, -32.6, -32.3, -31.2, -31.5, -31.2, -34.2, -29.2, -22.3, -15.0, 0.0, 0.8, 0.2, -0.6, -1.5, -1.6, -2.0, -1.4, -0.9, -0.9, -0.6, -0.6, -1.1, -0.8, -1.3, -0.1, 1.0, 0.4, -0.0, -0.5, 0.6, -0.3, -0.6, -1.1, -2.0, -2.4, -2.5, -2.8, -2.6, -2.3, -2.2, -2.4, -3.3, -2.9, -2.7, -2.4, -2.7, -2.9, -2.9, -2.8, -2.8, -3.0, -3.3, -2.6, -2.0, -1.6, -1.4, -1.4, -1.2]}]}, "event_riskon": {"x": [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48], "series": [{"key": "NDX", "name": "Nasdaq 100", "y": [-53.6, -55.5, -55.0, -56.6, -57.7, -61.2, -64.8, -64.1, -77.7, -60.1, -47.1, -28.3, 0.0, 2.8, 5.3, 4.6, 4.3, 7.2, 4.0, 4.4, 2.6, 4.8, 3.6, 4.1, 5.3, 9.6, 9.7, 10.5, 8.9, 11.7, 13.4, 12.0, 12.7, 14.7, 9.7, 8.4, 6.9, 3.4, 4.3, 4.6, 7.2, 7.3, 3.7, 4.7, 4.7, 2.1, 1.3, 2.9, 6.2, 5.9, 3.1, 2.3, 0.1, 0.9, 0.1, -1.7, -1.1, 1.4, 0.1, 0.4, 1.0]}, {"key": "BTC", "name": "Bitcoin", "y": [-115.7, -115.1, -113.3, -117.2, -114.2, -115.8, -107.1, -114.0, -125.3, -88.5, -62.0, -40.8, 0.0, 7.8, 16.2, 14.8, 20.8, 24.5, 18.7, 15.9, 17.6, 19.3, 21.9, 22.1, 25.0, 25.6, 32.1, 32.4, 29.7, 27.5, 29.3, 27.4, 27.0, 26.8, 19.6, 18.3, 19.6, 22.5, 27.4, 23.4, 26.9, 30.3, 31.8, 34.2, 35.6, 33.8, 34.1, 35.8, 37.4, 31.2, 30.2, 30.0, 22.8, 21.3, 24.6, 24.9, 36.4, 31.8, 29.9, 27.1, 23.9]}, {"key": "UST", "name": "US-Staatsanleihen 30J", "y": [26.6, 27.5, 27.5, 28.1, 28.0, 29.5, 30.9, 31.6, 38.5, 30.6, 22.0, 13.9, 0.0, -2.6, -1.7, -2.6, -2.7, -3.6, -3.5, -3.3, -3.4, -5.4, -4.4, -5.1, -5.2, -5.8, -5.5, -5.9, -5.5, -6.5, -6.6, -5.5, -5.5, -6.4, -6.3, -5.8, -4.9, -4.2, -5.6, -6.1, -5.9, -5.4, -5.8, -5.6, -6.2, -6.7, -6.9, -6.4, -5.6, -4.5, -4.9, -3.8, -3.6, -3.4, -3.8, -4.0, -3.4, -3.4, -2.9, -2.5, -3.2]}, {"key": "GOLD", "name": "Gold", "y": [26.2, 26.6, 25.5, 28.4, 25.9, 27.0, 27.4, 27.7, 33.6, 27.2, 21.5, 16.1, 0.0, 0.4, 2.0, 1.1, -0.0, -0.7, -1.1, -1.4, -1.4, -2.6, -1.0, 0.1, 0.9, -1.1, -0.4, 0.7, -0.4, -0.8, 0.2, -0.1, -0.3, -1.3, -0.3, -0.3, 0.4, 1.4, 2.7, 2.6, 1.9, 2.7, 2.3, 1.8, 2.8, 3.0, 3.1, 4.8, 5.6, 6.7, 6.4, 7.1, 7.8, 7.4, 9.1, 8.6, 7.9, 6.8, 8.1, 8.5, 7.5]}, {"key": "CHF", "name": "Schweizer Franken", "y": [18.2, 17.9, 17.6, 18.0, 17.3, 17.5, 17.2, 17.5, 20.9, 17.3, 14.0, 8.9, 0.0, -0.5, 0.3, 0.3, 0.8, 0.5, 0.8, 1.6, 2.1, 1.1, 1.0, 1.4, 1.6, 1.8, 2.1, 2.7, 2.3, 1.4, 1.7, 1.8, 2.0, 1.2, 1.7, 2.0, 2.2, 3.0, 2.3, 1.6, 2.0, 2.6, 3.2, 3.6, 3.7, 3.1, 2.7, 2.6, 2.9, 3.5, 3.9, 4.3, 4.2, 3.9, 4.7, 4.9, 5.3, 4.9, 5.2, 4.8, 4.0]}, {"key": "JPY", "name": "Yen", "y": [26.7, 26.8, 27.2, 28.9, 28.2, 29.6, 29.9, 30.4, 35.8, 28.7, 22.1, 13.1, 0.0, -0.8, -1.0, -0.8, -0.3, -0.9, -0.6, -0.6, 0.4, -0.8, -0.1, 0.2, 0.2, -0.9, -0.1, 0.1, 0.9, 0.4, 0.4, 1.0, 0.5, -0.4, 1.4, 1.3, 1.5, 2.6, 1.9, 1.2, 1.5, 1.7, 2.3, 1.9, 2.5, 2.4, 1.9, 1.7, 2.0, 1.9, 2.2, 3.0, 3.4, 3.2, 3.7, 4.4, 4.6, 4.6, 5.0, 4.3, 3.9]}]}, "equity": {"x": ["2019-07-05", "2019-07-12", "2019-07-19", "2019-07-26", "2019-08-02", "2019-08-09", "2019-08-16", "2019-08-23", "2019-08-30", "2019-09-06", "2019-09-13", "2019-09-20", "2019-09-27", "2019-10-04", "2019-10-11", "2019-10-18", "2019-10-25", "2019-11-01", "2019-11-08", "2019-11-15", "2019-11-22", "2019-11-29", "2019-12-06", "2019-12-13", "2019-12-20", "2019-12-27", "2020-01-03", "2020-01-10", "2020-01-17", "2020-01-24", "2020-01-31", "2020-02-07", "2020-02-14", "2020-02-21", "2020-02-28", "2020-03-06", "2020-03-13", "2020-03-20", "2020-03-27", "2020-04-03", "2020-04-10", "2020-04-17", "2020-04-24", "2020-05-01", "2020-05-08", "2020-05-15", "2020-05-22", "2020-05-29", "2020-06-05", "2020-06-12", "2020-06-19", "2020-06-26", "2020-07-03", "2020-07-10", "2020-07-17", "2020-07-24", "2020-07-31", "2020-08-07", "2020-08-14", "2020-08-21", "2020-08-28", "2020-09-04", "2020-09-11", "2020-09-18", "2020-09-25", "2020-10-02", "2020-10-09", "2020-10-16", "2020-10-23", "2020-10-30", "2020-11-06", "2020-11-13", "2020-11-20", "2020-11-27", "2020-12-04", "2020-12-11", "2020-12-18", "2020-12-25", "2021-01-01", "2021-01-08", "2021-01-15", "2021-01-22", "2021-01-29", "2021-02-05", "2021-02-12", "2021-02-19", "2021-02-26", "2021-03-05", "2021-03-12", "2021-03-19", "2021-03-26", "2021-04-02", "2021-04-09", "2021-04-16", "2021-04-23", "2021-04-30", "2021-05-07", "2021-05-14", "2021-05-21", "2021-05-28", "2021-06-04", "2021-06-11", "2021-06-18", "2021-06-25", "2021-07-02", "2021-07-09", "2021-07-16", "2021-07-23", "2021-07-30", "2021-08-06", "2021-08-13", "2021-08-20", "2021-08-27", "2021-09-03", "2021-09-10", "2021-09-17", "2021-09-24", "2021-10-01", "2021-10-08", "2021-10-15", "2021-10-22", "2021-10-29", "2021-11-05", "2021-11-12", "2021-11-19", "2021-11-26", "2021-12-03", "2021-12-10", "2021-12-17", "2021-12-24", "2021-12-31", "2022-01-07", "2022-01-14", "2022-01-21", "2022-01-28", "2022-02-04", "2022-02-11", "2022-02-18", "2022-02-25", "2022-03-04", "2022-03-11", "2022-03-18", "2022-03-25", "2022-04-01", "2022-04-08", "2022-04-15", "2022-04-22", "2022-04-29", "2022-05-06", "2022-05-13", "2022-05-20", "2022-05-27", "2022-06-03", "2022-06-10", "2022-06-17", "2022-06-24", "2022-07-01", "2022-07-08", "2022-07-15", "2022-07-22", "2022-07-29", "2022-08-05", "2022-08-12", "2022-08-19", "2022-08-26", "2022-09-02", "2022-09-09", "2022-09-16", "2022-09-23", "2022-09-30", "2022-10-07", "2022-10-14", "2022-10-21", "2022-10-28", "2022-11-04", "2022-11-11", "2022-11-18", "2022-11-25", "2022-12-02", "2022-12-09", "2022-12-16", "2022-12-23", "2022-12-30", "2023-01-06", "2023-01-13", "2023-01-20", "2023-01-27", "2023-02-03", "2023-02-10", "2023-02-17", "2023-02-24", "2023-03-03", "2023-03-10", "2023-03-17", "2023-03-24", "2023-03-31", "2023-04-07", "2023-04-14", "2023-04-21", "2023-04-28", "2023-05-05", "2023-05-12", "2023-05-19", "2023-05-26", "2023-06-02", "2023-06-09", "2023-06-16", "2023-06-23", "2023-06-30", "2023-07-07", "2023-07-14", "2023-07-21", "2023-07-28", "2023-08-04", "2023-08-11", "2023-08-18", "2023-08-25", "2023-09-01", "2023-09-08", "2023-09-15", "2023-09-22", "2023-09-29", "2023-10-06", "2023-10-13", "2023-10-20", "2023-10-27", "2023-11-03", "2023-11-10", "2023-11-17", "2023-11-24", "2023-12-01", "2023-12-08", "2023-12-15", "2023-12-22", "2023-12-29", "2024-01-05", "2024-01-12", "2024-01-19", "2024-01-26", "2024-02-02", "2024-02-09", "2024-02-16", "2024-02-23", "2024-03-01", "2024-03-08", "2024-03-15", "2024-03-22", "2024-03-29", "2024-04-05", "2024-04-12", "2024-04-19", "2024-04-26", "2024-05-03", "2024-05-10", "2024-05-17", "2024-05-24", "2024-05-31", "2024-06-07", "2024-06-14", "2024-06-21", "2024-06-28", "2024-07-05", "2024-07-12", "2024-07-19", "2024-07-26", "2024-08-02", "2024-08-09", "2024-08-16", "2024-08-23", "2024-08-30", "2024-09-06", "2024-09-13", "2024-09-20", "2024-09-27", "2024-10-04", "2024-10-11", "2024-10-18", "2024-10-25", "2024-11-01", "2024-11-08", "2024-11-15", "2024-11-22", "2024-11-29", "2024-12-06", "2024-12-13", "2024-12-20", "2024-12-27", "2025-01-03", "2025-01-10", "2025-01-17", "2025-01-24", "2025-01-31", "2025-02-07", "2025-02-14", "2025-02-21", "2025-02-28", "2025-03-07", "2025-03-14", "2025-03-21", "2025-03-28", "2025-04-04", "2025-04-11", "2025-04-18", "2025-04-25", "2025-05-02", "2025-05-09", "2025-05-16", "2025-05-23", "2025-05-30", "2025-06-06", "2025-06-13", "2025-06-20", "2025-06-27", "2025-07-04", "2025-07-11", "2025-07-18", "2025-07-25", "2025-08-01", "2025-08-08", "2025-08-15", "2025-08-22", "2025-08-29", "2025-09-05", "2025-09-12", "2025-09-19", "2025-09-26", "2025-10-03", "2025-10-10", "2025-10-17", "2025-10-24", "2025-10-31", "2025-11-07", "2025-11-14", "2025-11-21", "2025-11-28", "2025-12-05", "2025-12-12", "2025-12-19", "2025-12-26", "2026-01-02", "2026-01-09", "2026-01-16", "2026-01-23", "2026-01-30", "2026-02-06", "2026-02-13", "2026-02-20", "2026-02-27", "2026-03-06", "2026-03-13", "2026-03-20", "2026-03-27", "2026-04-03", "2026-04-10", "2026-04-17", "2026-04-24", "2026-05-01", "2026-05-08", "2026-05-15", "2026-05-22", "2026-05-29", "2026-06-05", "2026-06-12", "2026-06-19", "2026-06-26", "2026-07-03", "2026-07-10", "2026-07-17", "2026-07-24", "2026-07-31", "2026-08-07", "2026-08-14", "2026-08-21", "2026-08-28", "2026-09-04", "2026-09-11", "2026-09-18", "2026-09-25", "2026-10-02"], "series": [{"name": "Risk-on-Momentum Aktienindex", "y": [-0.14, -0.14, -0.14, -0.14, -0.14, 0.59, -0.24, -0.24, 0.15, -0.06, -0.06, -0.06, -0.06, -0.06, 0.25, 0.24, 0.24, 0.24, -0.25, -0.25, -0.31, -0.31, 0.11, -0.22, -0.22, -0.22, -0.22, -0.17, -0.17, -0.12, 1.12, 1.62, 1.62, 1.62, 2.1, 1.63, 0.58, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.45, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.83, 0.57, -0.07, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.08, 0.08, 0.08, 1.08, 0.96, 0.96, 0.96, 0.44, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, -0.08, -0.09, -0.09, -0.09, 0.1, 0.1, 0.1, 0.1, -0.72, -0.19, -0.19, 0.01, 0.01, 0.2, 0.2, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 1.09, 1.15, 1.15, 0.74, 0.74, 0.74, 0.79, 0.79, 0.79, 0.22, 1.08, 1.02, 1.99, 1.99, 1.99, 1.99, 1.99, 1.99, 1.47, 1.47, 1.47, 1.76, 3.42, 3.42, 2.98, 2.98, 2.98, 2.98, 2.98, 2.98, 2.98, 2.92, 2.92, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 3.19, 2.46, 2.46, 2.46, 2.46, 2.46, 2.46, 2.46, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.36, 2.36, 2.19, 2.34, 2.34, 2.34, 2.34, 2.34, 4.09, 4.15, 3.97, 3.97, 3.97, 3.97, 3.97, 4.54, 4.54, 4.54, 5.62, 5.62, 5.62, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.73, 5.73, 5.59, 5.53, 5.53, 5.53, 5.53, 5.53, 5.53, 5.89, 5.87, 5.87, 5.87, 5.85, 6.14, 6.14, 6.14, 7.57, 7.57, 7.57, 7.86, 7.86, 7.86, 8.33, 8.33, 8.33, 8.33, 8.23, 8.85, 8.95, 8.96, 8.96, 8.96, 8.96, 8.96, 9.72, 9.72, 9.72, 9.72, 9.72, 9.89, 9.99, 9.16, 9.23, 9.5, 9.84, 9.84, 9.84, 9.84, 10.19, 10.8, 10.8, 10.4, 10.4, 10.4, 10.4, 10.43, 11.54, 11.27, 11.54, 11.54, 11.54, 11.54, 11.54, 11.54, 11.54, 11.54, 11.54, 11.54, 11.12, 10.99, 10.99, 10.99, 11.04, 10.44, 10.49, 10.49, 10.49, 10.87, 11.28, 11.28, 11.55, 11.55, 11.1, 11.31, 11.31, 11.25, 11.25, 11.25, 11.25, 11.72, 11.72, 11.72, 11.72, 11.72, 11.72, 11.18, 11.18, 11.18, 11.18, 11.18, 11.18, 11.42, 11.42, 11.42, 11.51, 12.23, 12.23, 12.32, 12.83, 12.55, 12.13, 12.13, 12.13, 11.96, 11.96, 11.96, 11.96, 11.96, 11.78, 12.52, 12.52, 13.94, 13.49, 13.49, 13.49, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.25, 14.25, 14.25, 14.25, 14.25, 14.25, 14.25, 14.81, 14.81, 14.81]}, {"name": "Gegenhalten nach Panik", "y": [0.0, 0.0, 0.0, 0.0, -0.92, 0.26, 1.15, 1.05, 1.9, 3.23, 3.23, 3.54, 4.73, 2.77, 4.25, 4.25, 4.25, 3.69, 3.05, 3.01, 3.01, 3.01, 2.88, 2.88, 2.88, 2.88, 2.64, 4.93, 4.93, 5.16, 3.82, 3.99, 3.99, 4.21, -2.57, -2.61, -4.24, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.6, -4.61, -4.54, -4.54, -3.69, -3.86, -3.87, -3.87, -3.87, -3.87, -2.2, -2.58, -2.58, -2.58, -2.58, -2.58, -2.58, -1.18, -1.18, 0.82, 1.83, 1.83, 1.92, 1.77, 1.77, 1.77, 0.76, 0.9, 0.92, 0.88, 1.15, 1.15, 1.15, 1.15, 2.6, 2.55, 3.64, 3.64, 5.18, 5.52, 5.52, 5.52, 5.52, 8.52, 8.52, 9.43, 9.31, 8.64, 8.03, 8.04, 8.04, 8.64, 8.64, 8.64, 7.89, 7.73, 8.66, 9.63, 12.57, 12.57, 12.62, 13.04, 13.06, 13.05, 13.17, 11.14, 12.35, 12.22, 12.05, 12.05, 12.05, 12.05, 12.19, 11.14, 11.09, 11.09, 11.09, 12.01, 13.82, 14.13, 14.13, 15.43, 15.43, 15.43, 15.43, 15.43, 15.43, 16.24, 16.24, 14.97, 14.99, 14.99, 14.99, 14.99, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.87, 14.51, 14.51, 14.51, 14.51, 14.51, 14.51, 14.51, 15.88, 15.88, 15.88, 16.09, 16.09, 16.09, 16.09, 16.09, 16.56, 16.56, 14.82, 15.8, 15.8, 15.8, 15.8, 15.8, 15.8, 15.73, 15.88, 17.61, 17.6, 17.29, 17.29, 17.29, 17.29, 17.9, 17.95, 17.95, 17.95, 17.49, 17.49, 17.49, 17.49, 17.19, 17.19, 17.19, 17.04, 17.04, 15.87, 16.48, 16.58, 16.57, 16.57, 16.57, 16.57, 16.57, 16.57, 16.57, 16.38, 15.77, 15.76, 15.76, 15.76, 15.32, 15.32, 15.32, 15.36, 15.36, 16.15, 16.15, 16.15, 16.15, 16.15, 16.15, 15.23, 15.23, 15.23, 15.23, 15.23, 16.56, 16.56, 16.59, 16.8, 16.86, 16.87, 17.62, 17.61, 17.5, 17.5, 17.5, 17.5, 17.93, 16.36, 16.29, 16.28, 16.28, 16.95, 16.18, 16.59, 15.36, 13.96, 15.85, 16.27, 16.65, 16.65, 16.55, 16.54, 16.54, 16.54, 16.54, 16.54, 16.54, 16.54, 16.54, 16.54, 16.54, 17.31, 17.31, 17.31, 17.31, 17.31, 17.31, 16.98, 16.98, 16.98, 17.5, 16.91, 16.91, 16.91, 16.93, 18.52, 19.5, 19.46, 19.46, 19.46, 15.46, 17.81, 17.99, 17.99, 17.99, 17.99, 17.99, 18.11, 17.91, 17.91, 18.36, 18.34, 18.34, 18.34, 18.34, 18.34, 18.34, 18.08, 18.07, 18.07, 18.07, 18.07, 18.21, 18.2, 18.2, 18.2, 18.2, 17.48, 17.8, 17.8, 17.8, 16.31, 16.73, 16.94, 16.94, 16.94, 18.59, 18.59, 18.59, 18.59, 18.59, 18.59, 18.36, 18.7, 20.36, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.5, 20.82, 20.82, 20.82, 20.82, 20.74, 20.74, 20.74, 20.1, 20.1, 21.06, 21.06, 21.38, 21.38, 21.38]}, {"name": "Deine Idee: Gold+Bonds long / BTC+Nasdaq short", "y": [0.0, 0.0, -0.02, -0.02, -0.25, -0.57, -1.25, 0.13, -0.39, -0.63, -0.63, -0.88, 0.61, 0.51, 0.27, 0.27, 0.27, 0.5, 0.49, 0.19, -0.37, -0.37, -0.8, -0.72, -0.72, -0.72, -0.49, -0.83, -0.83, -0.91, -1.37, -1.63, -1.47, -1.42, -3.01, -2.46, -2.66, -3.22, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -3.23, -2.72, -2.84, -2.84, -2.84, -2.84, -2.84, -2.84, -2.84, -2.84, -3.12, -3.12, -3.12, -2.75, -2.67, -2.67, -3.06, -3.29, -3.29, -3.29, -3.29, -3.37, -4.07, -3.55, -3.55, -3.55, -3.55, -3.61, -3.61, -3.08, -3.08, -3.24, -3.21, -3.21, -3.53, -3.53, -3.53, -3.53, -3.26, -3.35, -3.4, -3.46, -3.36, -3.36, -3.49, -3.49, -3.59, -3.66, -2.92, -2.92, -4.1, -4.03, -4.03, -4.03, -4.03, -3.79, -3.79, -2.97, -3.1, -2.5, -2.63, -4.29, -4.17, -4.4, -4.4, -4.4, -5.04, -5.33, -4.7, -5.8, -6.0, -6.0, -6.3, -5.99, -5.59, -5.64, -5.64, -4.26, -4.47, -4.5, -4.3, -4.42, -4.42, -4.42, -4.75, -3.81, -3.61, -3.88, -3.36, -3.65, -3.14, -4.38, -5.25, -5.52, -5.52, -5.54, -5.54, -5.54, -5.54, -6.03, -6.03, -6.42, -6.04, -6.18, -6.18, -6.18, -6.1, -6.1, -6.5, -6.5, -6.5, -6.5, -6.57, -6.65, -6.65, -6.65, -6.65, -6.87, -6.87, -6.87, -6.73, -6.73, -6.73, -6.73, -6.73, -6.73, -6.73, -6.91, -6.98, -6.98, -7.04, -7.06, -7.06, -7.08, -7.08, -6.87, -6.87, -6.26, -6.35, -6.35, -6.35, -6.35, -6.33, -6.33, -5.78, -3.45, -2.24, -2.24, -2.25, -2.25, -2.25, -2.25, -2.41, -2.98, -3.15, -3.14, -3.54, -3.22, -3.22, -3.68, -3.68, -4.68, -4.68, -4.83, -4.83, -5.74, -6.24, -5.1, -5.48, -5.7, -5.7, -5.7, -5.7, -5.7, -6.31, -5.04, -5.37, -5.44, -5.44, -5.44, -5.84, -5.82, -5.37, -5.64, -5.64, -5.96, -6.48, -6.84, -6.84, -6.77, -7.11, -8.06, -8.06, -8.06, -8.06, -8.06, -8.44, -8.44, -8.61, -8.61, -8.6, -8.41, -7.51, -7.51, -8.08, -8.08, -8.32, -8.32, -8.27, -8.12, -8.0, -8.29, -8.29, -8.21, -6.5, -5.89, -5.78, -5.26, -4.15, -3.99, -3.96, -3.96, -4.66, -5.03, -5.03, -5.42, -5.78, -5.78, -5.78, -5.78, -5.78, -5.85, -6.16, -6.55, -6.55, -6.55, -6.55, -6.61, -6.61, -7.23, -7.23, -7.23, -7.29, -6.57, -7.28, -6.95, -6.52, -6.66, -5.15, -5.59, -6.1, -6.22, -8.28, -9.19, -9.19, -9.19, -9.92, -9.92, -9.92, -10.55, -10.03, -10.03, -10.2, -10.2, -10.2, -10.2, -10.2, -10.2, -10.2, -9.77, -9.77, -9.77, -9.77, -9.77, -8.99, -8.99, -8.99, -8.97, -9.46, -7.87, -7.22, -7.37, -7.37, -7.9, -9.52, -8.79, -8.79, -8.79, -8.35, -8.35, -8.35, -8.17, -8.3, -8.53, -8.57, -8.2, -9.01, -9.06, -9.06, -7.99, -8.44, -8.44, -8.44, -8.44, -8.44, -8.44, -8.44, -8.44, -8.5, -8.5, -8.5, -8.5, -8.5, -8.63, -8.99, -8.99, -9.67, -10.07, -10.37, -10.37, -10.37, -10.57, -10.57, -10.57, -12.15, -12.15, -12.56, -12.72, -12.95, -12.95, -12.95]}, {"name": "Rotation folgen (Basis)", "y": [-0.41, -0.41, -0.29, -0.29, -0.47, 0.15, -0.8, 0.37, 0.09, 0.06, 0.06, -0.22, -0.16, 0.01, -0.5, -0.84, 0.0, 0.22, 0.65, 0.1, -0.41, -0.41, 0.69, 0.67, 0.67, 0.67, 0.96, 0.62, 0.62, 0.4, -0.18, -0.94, -1.15, -1.09, -2.64, -2.55, -3.82, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.53, -4.3, -4.74, -4.81, -4.81, -4.81, -4.81, -4.81, -4.81, -4.81, -4.49, -4.5, -4.5, -4.5, -5.23, -5.2, -5.2, -4.76, -5.01, -5.01, -5.01, -5.01, -5.4, -5.94, -5.55, -5.68, -5.68, -5.78, -6.05, -6.05, -6.0, -6.0, -6.14, -5.95, -6.08, -6.01, -5.88, -5.88, -5.88, -6.29, -7.24, -7.3, -7.3, -7.37, -7.37, -7.45, -7.45, -7.88, -7.92, -8.13, -8.13, -9.05, -9.12, -9.12, -9.12, -9.28, -9.25, -9.26, -7.99, -8.08, -8.02, -7.47, -9.59, -9.45, -10.4, -10.52, -10.73, -11.0, -11.27, -11.59, -12.75, -12.04, -12.05, -12.47, -12.14, -11.62, -11.92, -11.63, -10.69, -11.5, -11.73, -11.77, -12.03, -12.03, -12.03, -12.09, -11.43, -11.91, -12.06, -11.77, -12.03, -11.29, -12.25, -12.15, -12.43, -12.43, -11.97, -11.97, -11.97, -11.97, -12.46, -12.5, -12.11, -12.08, -12.18, -12.18, -12.18, -12.01, -12.1, -12.26, -12.26, -12.26, -12.26, -12.09, -12.57, -12.57, -12.57, -12.57, -12.66, -12.67, -12.67, -13.91, -13.91, -13.91, -13.91, -13.91, -13.91, -13.91, -13.91, -13.98, -13.98, -13.91, -13.93, -13.93, -13.89, -13.89, -13.49, -13.49, -12.79, -12.99, -12.94, -12.88, -12.89, -12.78, -12.87, -12.68, -9.39, -8.34, -8.47, -8.48, -9.57, -9.57, -9.29, -9.08, -9.53, -9.73, -8.75, -8.92, -8.82, -8.93, -9.45, -9.53, -10.1, -10.1, -10.09, -10.66, -11.98, -11.36, -11.28, -11.4, -11.4, -11.47, -11.47, -11.47, -11.47, -11.67, -10.67, -11.09, -11.77, -11.82, -11.77, -11.95, -12.06, -11.93, -12.55, -12.57, -12.7, -12.79, -13.77, -13.95, -13.95, -14.89, -15.62, -15.62, -15.11, -14.88, -15.19, -13.89, -13.78, -14.0, -14.0, -14.1, -13.59, -12.61, -12.65, -12.61, -12.61, -12.83, -12.83, -12.14, -12.03, -11.88, -12.09, -12.1, -12.17, -13.06, -12.37, -12.36, -12.5, -11.21, -11.15, -11.83, -11.83, -12.61, -12.95, -12.55, -12.86, -13.27, -13.27, -13.27, -13.27, -13.23, -13.81, -14.57, -15.05, -15.05, -15.43, -15.43, -15.46, -15.46, -15.66, -15.66, -15.66, -15.59, -15.85, -16.13, -15.55, -15.51, -15.89, -15.76, -16.69, -16.87, -16.96, -18.24, -17.44, -17.75, -17.74, -17.7, -17.51, -17.43, -17.91, -17.5, -17.5, -17.54, -17.54, -17.13, -16.74, -16.74, -16.74, -16.74, -16.63, -16.56, -16.56, -16.56, -16.56, -16.45, -16.21, -16.18, -15.8, -15.79, -15.09, -14.78, -15.35, -15.26, -14.94, -16.13, -16.44, -16.44, -16.44, -16.77, -17.02, -17.02, -17.31, -17.52, -17.6, -18.19, -18.26, -18.45, -19.14, -19.14, -18.52, -18.75, -18.75, -18.75, -18.75, -18.75, -18.75, -18.75, -18.75, -18.51, -18.51, -18.51, -18.51, -18.51, -18.89, -19.27, -19.27, -19.49, -18.64, -18.71, -18.71, -18.71, -19.05, -19.08, -19.08, -18.88, -18.88, -17.29, -17.36, -17.4, -17.45, -17.45]}, {"name": "Rotation folgen + Quelle short", "y": [-0.45, -0.45, -0.22, -0.22, -0.14, -0.06, -1.83, 0.05, -0.83, -0.91, -0.91, -1.49, -2.06, -1.71, -2.78, -3.55, -2.8, -2.78, -2.1, -3.04, -4.11, -4.11, -3.75, -2.84, -2.84, -2.84, -1.96, -2.45, -2.45, -3.02, -3.48, -4.81, -5.2, -5.42, -5.77, -8.57, -10.89, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -12.01, -11.82, -12.16, -12.21, -12.21, -12.21, -12.21, -12.21, -12.21, -12.21, -12.15, -12.17, -12.17, -12.17, -12.32, -12.27, -12.27, -11.2, -11.66, -11.66, -11.66, -11.66, -12.8, -14.21, -12.11, -12.7, -12.7, -13.02, -13.64, -13.64, -13.89, -13.89, -15.53, -15.68, -15.99, -16.32, -17.07, -17.07, -17.07, -17.53, -18.45, -18.61, -18.66, -18.57, -18.57, -18.78, -18.78, -19.39, -19.43, -19.19, -19.19, -21.53, -21.44, -21.44, -21.44, -21.82, -22.44, -22.44, -19.87, -20.03, -19.99, -19.99, -22.98, -22.79, -24.49, -25.03, -25.39, -26.14, -26.5, -26.9, -29.24, -28.64, -28.23, -28.72, -28.54, -28.06, -28.64, -28.26, -25.32, -27.1, -27.18, -27.06, -27.26, -27.26, -27.26, -26.82, -26.19, -25.56, -25.99, -25.58, -26.13, -25.95, -27.51, -27.15, -28.04, -28.04, -27.01, -27.01, -27.01, -27.01, -28.11, -28.38, -29.27, -28.92, -29.18, -29.18, -29.18, -28.67, -28.72, -28.58, -28.58, -28.58, -28.58, -28.5, -28.52, -28.52, -28.52, -28.52, -28.7, -28.7, -28.7, -30.66, -30.66, -30.66, -30.66, -30.66, -30.66, -30.66, -30.64, -30.71, -30.71, -30.99, -31.02, -31.02, -31.11, -31.11, -30.75, -30.75, -29.68, -29.95, -29.29, -29.21, -29.04, -29.16, -29.26, -27.53, -23.91, -21.78, -22.29, -22.27, -22.96, -22.96, -23.14, -23.38, -23.5, -23.76, -22.23, -22.82, -22.58, -22.54, -23.6, -23.87, -24.28, -24.28, -24.43, -24.83, -27.05, -26.19, -26.07, -26.38, -26.33, -26.06, -26.06, -26.06, -26.06, -26.64, -25.59, -25.57, -26.7, -26.71, -26.74, -27.08, -27.36, -27.52, -28.65, -28.67, -29.12, -29.31, -30.89, -31.6, -31.6, -32.36, -33.09, -33.09, -33.11, -32.91, -33.09, -32.28, -32.27, -32.47, -32.47, -32.43, -31.39, -29.15, -29.27, -29.63, -29.63, -29.84, -29.84, -29.69, -29.67, -29.27, -29.54, -29.69, -29.62, -29.97, -29.15, -28.06, -28.13, -25.7, -25.96, -26.61, -26.61, -27.42, -28.51, -28.74, -29.43, -30.17, -30.17, -30.17, -30.17, -29.58, -28.39, -29.16, -29.95, -29.95, -30.18, -30.18, -30.37, -30.37, -31.1, -31.1, -31.1, -30.94, -30.23, -31.14, -30.75, -30.51, -31.63, -30.01, -31.84, -32.13, -32.28, -35.49, -34.93, -35.42, -35.44, -36.33, -36.07, -36.23, -37.07, -36.75, -36.75, -36.84, -36.84, -36.31, -36.12, -36.12, -36.12, -36.12, -35.6, -35.81, -35.81, -35.81, -35.81, -35.43, -35.4, -35.57, -35.22, -35.24, -33.72, -32.46, -33.08, -33.14, -33.02, -34.84, -35.43, -35.43, -35.43, -35.43, -35.62, -35.62, -35.74, -35.9, -35.93, -36.41, -37.21, -38.15, -38.88, -38.88, -37.94, -39.04, -39.04, -39.04, -39.04, -39.04, -39.04, -39.04, -39.04, -38.88, -38.88, -38.88, -38.88, -38.88, -39.27, -40.11, -40.11, -40.83, -40.09, -40.28, -40.28, -40.28, -40.64, -40.73, -40.73, -40.53, -40.53, -38.65, -38.93, -39.65, -39.74, -39.74]}]}, "latency": {"x": [0, 1, 2, 3, 4], "series": [{"name": "ohne Kosten", "y": [0.39, 0.08, 0.05, 0.78, 0.52]}, {"name": "realistische Kosten", "y": [-0.71, -1.11, -1.1, -0.4, -0.56]}, {"name": "doppelte Kosten", "y": [-1.76, -2.21, -2.17, -1.56, -1.61]}]}, "patterns": {"x": [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "series": [{"name": "Klassisches Risk-off", "y": [17, 35, 8, 18, 20, 13, 11, 23, 19, 19, 7, 16, 14, 17, 7, 11, 7, 6, 11, 3]}, {"name": "Zins-/Inflationsschock", "y": [2, 5, 1, 1, 2, 0, 3, 2, 1, 0, 0, 2, 0, 1, 6, 10, 9, 3, 7, 2]}, {"name": "Liquidation / Dash for Cash", "y": [2, 0, 1, 0, 1, 0, 2, 0, 2, 3, 0, 2, 0, 1, 7, 5, 2, 8, 1, 7]}, {"name": "Liquiditätsrally", "y": [2, 1, 7, 7, 4, 2, 10, 5, 6, 6, 7, 15, 6, 4, 15, 17, 19, 25, 11, 18]}, {"name": "Reflations-Risk-on", "y": [12, 17, 18, 19, 29, 24, 17, 20, 21, 15, 19, 18, 15, 16, 19, 13, 13, 11, 8, 1]}]}, "followthrough": {"assets": ["SPY", "QQQ", "TLT", "GLD", "JPY", "CHF", "USD", "OIL", "BTC"], "rows": [{"pattern": "Klassisches Risk-off (Aktien↓, Anleihen↑, Gold/Yen↑)", "n": 282, "vals": [{"a": "SPY", "m": 0.19, "t": 1.9}, {"a": "QQQ", "m": 0.17, "t": 1.6}, {"a": "TLT", "m": -0.15, "t": -2.2}, {"a": "GLD", "m": 0.04, "t": 0.5}, {"a": "JPY", "m": -0.1, "t": -2.2}, {"a": "CHF", "m": -0.1, "t": -2.0}, {"a": "USD", "m": 0.03, "t": 1.1}, {"a": "OIL", "m": 0.06, "t": 0.3}, {"a": "BTC", "m": 0.18, "t": 0.5}]}, {"pattern": "Zins-/Inflationsschock (Aktien↓, Anleihen↓)", "n": 57, "vals": [{"a": "SPY", "m": -0.33, "t": -0.9}, {"a": "QQQ", "m": -0.39, "t": -1.2}, {"a": "TLT", "m": 0.03, "t": 0.2}, {"a": "GLD", "m": -0.16, "t": -0.8}, {"a": "JPY", "m": -0.01, "t": -0.1}, {"a": "CHF", "m": -0.14, "t": -2.3}, {"a": "USD", "m": 0.14, "t": 2.7}, {"a": "OIL", "m": 0.07, "t": 0.2}, {"a": "BTC", "m": -0.98, "t": -1.1}]}, {"pattern": "Liquidation / Dash for Cash (alles↓, USD↑)", "n": 44, "vals": [{"a": "SPY", "m": 0.12, "t": 0.6}, {"a": "QQQ", "m": 0.16, "t": 0.7}, {"a": "TLT", "m": 0.03, "t": 0.2}, {"a": "GLD", "m": -0.38, "t": -1.7}, {"a": "JPY", "m": -0.15, "t": -1.5}, {"a": "CHF", "m": -0.13, "t": -1.6}, {"a": "USD", "m": 0.16, "t": 1.9}, {"a": "OIL", "m": -0.42, "t": -0.8}, {"a": "BTC", "m": -0.2, "t": -0.4}]}, {"pattern": "Sell America (Aktien↓, Anleihen↓, USD↓)", "n": 25, "vals": [{"a": "SPY", "m": 0.91, "t": 2.0}, {"a": "QQQ", "m": 1.16, "t": 2.2}, {"a": "TLT", "m": -0.17, "t": -0.9}, {"a": "GLD", "m": 0.3, "t": 1.2}, {"a": "JPY", "m": -0.08, "t": -0.5}, {"a": "CHF", "m": -0.13, "t": -1.0}, {"a": "USD", "m": 0.12, "t": 0.6}, {"a": "OIL", "m": 0.79, "t": 2.0}, {"a": "BTC", "m": -0.28, "t": -0.3}]}, {"pattern": "Aktien↓ ohne Hafen-Zufluss", "n": 223, "vals": [{"a": "SPY", "m": 0.13, "t": 1.3}, {"a": "QQQ", "m": 0.22, "t": 2.0}, {"a": "TLT", "m": -0.12, "t": -1.6}, {"a": "GLD", "m": 0.06, "t": 0.8}, {"a": "JPY", "m": -0.03, "t": -0.7}, {"a": "CHF", "m": -0.06, "t": -1.4}, {"a": "USD", "m": 0.03, "t": 0.7}, {"a": "OIL", "m": -0.22, "t": -1.4}, {"a": "BTC", "m": -0.31, "t": -0.7}]}, {"pattern": "Liquiditätsrally (Aktien↑, Anleihen↑, USD↓)", "n": 187, "vals": [{"a": "SPY", "m": 0.05, "t": 0.7}, {"a": "QQQ", "m": 0.13, "t": 1.4}, {"a": "TLT", "m": -0.04, "t": -0.6}, {"a": "GLD", "m": 0.2, "t": 2.8}, {"a": "JPY", "m": -0.01, "t": -0.2}, {"a": "CHF", "m": 0.08, "t": 2.0}, {"a": "USD", "m": -0.05, "t": -1.4}, {"a": "OIL", "m": 0.1, "t": 0.7}, {"a": "BTC", "m": -0.21, "t": -0.6}]}, {"pattern": "Reflations-Risk-on (Aktien↑, Anleihen↓)", "n": 325, "vals": [{"a": "SPY", "m": -0.09, "t": -1.2}, {"a": "QQQ", "m": -0.12, "t": -1.4}, {"a": "TLT", "m": 0.09, "t": 1.5}, {"a": "GLD", "m": 0.09, "t": 1.4}, {"a": "JPY", "m": 0.01, "t": 0.2}, {"a": "CHF", "m": -0.01, "t": -0.2}, {"a": "USD", "m": -0.01, "t": -0.3}, {"a": "OIL", "m": -0.09, "t": -0.6}, {"a": "BTC", "m": -0.08, "t": -0.2}]}, {"pattern": "Risk-on sonstig (Aktien↑)", "n": 241, "vals": [{"a": "SPY", "m": -0.07, "t": -1.0}, {"a": "QQQ", "m": -0.04, "t": -0.5}, {"a": "TLT", "m": 0.04, "t": 0.7}, {"a": "GLD", "m": 0.06, "t": 0.6}, {"a": "JPY", "m": 0.02, "t": 0.5}, {"a": "CHF", "m": 0.02, "t": 0.4}, {"a": "USD", "m": 0.0, "t": 0.0}, {"a": "OIL", "m": -0.27, "t": -1.9}, {"a": "BTC", "m": 0.34, "t": 1.0}]}, {"pattern": "Rohstoff-/Ölimpuls (Öl↑↑)", "n": 166, "vals": [{"a": "SPY", "m": 0.03, "t": 0.3}, {"a": "QQQ", "m": 0.02, "t": 0.2}, {"a": "TLT", "m": 0.03, "t": 0.3}, {"a": "GLD", "m": -0.02, "t": -0.2}, {"a": "JPY", "m": -0.02, "t": -0.4}, {"a": "CHF", "m": -0.03, "t": -0.7}, {"a": "USD", "m": 0.04, "t": 1.0}, {"a": "OIL", "m": 0.13, "t": 0.6}, {"a": "BTC", "m": 0.36, "t": 0.9}]}, {"pattern": "Flucht in Gold/Yen bei ruhigen Aktien", "n": 245, "vals": [{"a": "SPY", "m": 0.07, "t": 0.9}, {"a": "QQQ", "m": 0.11, "t": 1.3}, {"a": "TLT", "m": -0.05, "t": -0.8}, {"a": "GLD", "m": 0.11, "t": 1.6}, {"a": "JPY", "m": -0.01, "t": -0.1}, {"a": "CHF", "m": 0.09, "t": 2.3}, {"a": "USD", "m": -0.03, "t": -1.0}, {"a": "OIL", "m": -0.01, "t": -0.1}, {"a": "BTC", "m": 0.54, "t": 1.6}]}, {"pattern": "Ruhig / ohne klares Muster", "n": 3075, "vals": [{"a": "SPY", "m": 0.04, "t": 1.9}, {"a": "QQQ", "m": 0.06, "t": 2.4}, {"a": "TLT", "m": 0.03, "t": 2.0}, {"a": "GLD", "m": 0.02, "t": 1.1}, {"a": "JPY", "m": 0.0, "t": 0.3}, {"a": "CHF", "m": 0.02, "t": 1.5}, {"a": "USD", "m": 0.0, "t": 0.5}, {"a": "OIL", "m": -0.01, "t": -0.1}, {"a": "BTC", "m": 0.24, "t": 2.6}]}]}, "pairs": {"keys": ["SPX", "NDX", "DAX", "NKY", "BTC", "ETH", "AUDJPY", "MXN", "COPPER", "OIL", "SILVER", "GOLD", "UST", "BUND", "JPY", "CHF", "USD"], "m": {"SPX|UST": [-0.7, 0.14, -1.06], "SPX|USD": [-1.6, -0.51, -1.9], "NDX|SPX": [-0.47, -0.29, -0.43], "NDX|NKY": [-0.88, -0.29, -0.66], "NDX|UST": [-0.77, 0.08, -0.57], "NDX|USD": [-1.28, -0.24, -1.41], "NDX|OIL": [-0.64, -0.17, -0.52], "NDX|SILVER": [-0.78, -0.29, -1.4], "DAX|SPX": [-1.37, -1.08, -0.67], "DAX|NDX": [-1.48, -1.09, -0.84], "DAX|NKY": [-1.67, -1.2, -1.22], "DAX|ETH": [-0.9, -0.22, -1.43], "DAX|MXN": [-2.4, -1.43, -2.11], "DAX|UST": [-0.57, 0.31, -1.5], "DAX|GOLD": [-0.2, 0.39, -0.34], "DAX|JPY": [-0.15, 0.46, -1.01], "DAX|USD": [-1.28, -0.22, -1.55], "DAX|OIL": [-0.39, 0.09, 0.06], "DAX|SILVER": [-0.73, -0.13, -1.21], "NKY|SPX": [-0.95, -0.34, -0.94], "NKY|UST": [-1.37, -0.22, -1.28], "NKY|USD": [-1.54, -0.32, -1.74], "NKY|OIL": [-0.78, -0.15, -0.62], "NKY|SILVER": [-0.8, -0.05, -1.18], "BTC|SPX": [-1.13, -0.49, -1.17], "BTC|NDX": [-0.95, -0.37, -0.67], "BTC|DAX": [-0.74, -0.05, -1.21], "BTC|NKY": [-1.09, -0.18, -0.58], "BTC|ETH": [-0.01, 0.3, -0.95], "BTC|MXN": [-1.49, -0.4, -1.28], "BTC|COPPER": [-0.58, 0.25, -0.85], "BTC|UST": [-0.69, 0.35, -0.87], "BTC|BUND": [-1.01, 0.13, -1.15], "BTC|GOLD": [-0.24, 0.47, -0.49], "BTC|JPY": [0.12, 0.84, -0.13], "BTC|CHF": [0.08, 0.78, 0.12], "BTC|USD": [-0.43, 0.8, -1.28], "BTC|OIL": [-0.45, 0.11, 0.08], "BTC|SILVER": [-0.63, 0.12, -1.09], "ETH|SPX": [-1.24, -0.6, -1.35], "ETH|NDX": [-1.1, -0.5, -0.96], "ETH|NKY": [-1.24, -0.35, -0.94], "ETH|MXN": [-1.91, -0.82, -1.65], "ETH|UST": [-0.52, 0.53, -0.5], "ETH|GOLD": [-0.36, 0.35, -0.06], "ETH|JPY": [0.22, 0.92, 0.33], "ETH|USD": [-0.3, 0.95, -0.56], "ETH|OIL": [-0.52, 0.1, -0.08], "ETH|SILVER": [-0.66, 0.12, -0.71], "AUDJPY|SPX": [-0.11, 0.46, -0.17], "AUDJPY|NDX": [0.02, 0.56, -0.36], "AUDJPY|DAX": [-0.27, 0.33, -0.01], "AUDJPY|NKY": [-1.47, -0.71, -1.73], "AUDJPY|BTC": [-0.64, 0.16, -0.7], "AUDJPY|ETH": [-0.7, 0.11, -0.54], "AUDJPY|MXN": [-0.91, 0.28, -0.82], "AUDJPY|COPPER": [-0.82, -0.21, -0.52], "AUDJPY|UST": [-0.5, 0.6, -0.33], "AUDJPY|BUND": [-0.18, 0.97, 0.05], "AUDJPY|GOLD": [-0.53, 0.17, -0.6], "AUDJPY|JPY": [0.2, 0.96, 0.26], "AUDJPY|CHF": [0.08, 0.76, 0.17], "AUDJPY|USD": [-1.78, -0.5, -1.98], "AUDJPY|OIL": [-0.57, -0.01, -0.51], "AUDJPY|SILVER": [-0.95, -0.24, -1.01], "MXN|SPX": [-1.91, -0.91, -1.54], "MXN|NDX": [-1.67, -0.62, -1.17], "MXN|NKY": [-1.59, -0.43, -1.42], "MXN|UST": [-1.48, -0.08, -1.43], "MXN|USD": [-1.94, -0.27, -1.49], "MXN|OIL": [-1.36, -0.45, -0.82], "MXN|SILVER": [-1.82, -0.82, -1.59], "COPPER|SPX": [-0.93, -0.3, -0.93], "COPPER|NDX": [-0.8, -0.2, -1.24], "COPPER|DAX": [-1.78, -1.03, -2.0], "COPPER|NKY": [-1.4, -0.54, -1.42], "COPPER|ETH": [-0.49, 0.28, -0.44], "COPPER|MXN": [-1.74, -0.72, -1.38], "COPPER|UST": [-0.83, 0.27, -0.93], "COPPER|GOLD": [-0.83, -0.16, -0.47], "COPPER|JPY": [-0.46, 0.32, -0.06], "COPPER|USD": [-0.88, 0.22, -0.53], "COPPER|OIL": [-0.48, 0.04, -0.14], "COPPER|SILVER": [-0.74, -0.09, -0.55], "BUND|SPX": [-0.82, 0.08, -1.85], "BUND|NDX": [-0.68, 0.23, -1.09], "BUND|DAX": [-0.75, 0.18, -1.73], "BUND|NKY": [-1.19, -0.09, -1.1], "BUND|ETH": [-0.72, 0.41, -0.59], "BUND|MXN": [-1.97, -0.43, -2.03], "BUND|COPPER": [-0.94, 0.19, -0.97], "BUND|UST": [-2.46, -1.88, -2.11], "BUND|GOLD": [-1.45, -0.57, -1.08], "BUND|JPY": [-1.04, -0.2, -0.77], "BUND|CHF": [-1.57, -0.56, -1.05], "BUND|USD": [-1.19, 0.13, -0.93], "BUND|OIL": [-0.33, 0.59, 0.25], "BUND|SILVER": [-0.85, 0.04, -0.41], "GOLD|SPX": [-0.5, 0.06, -0.63], "GOLD|NDX": [-0.28, 0.2, -0.27], "GOLD|NKY": [-0.8, -0.05, -0.82], "GOLD|MXN": [-1.13, -0.09, -1.28], "GOLD|UST": [-0.19, 0.58, 0.11], "GOLD|JPY": [0.41, 0.87, 0.73], "GOLD|USD": [-0.55, 0.42, -0.63], "GOLD|OIL": [-0.63, -0.17, -0.16], "GOLD|SILVER": [-0.87, -0.55, -0.81], "JPY|SPX": [-0.26, 0.34, -0.4], "JPY|NDX": [-0.18, 0.38, -0.1], "JPY|NKY": [-0.0, 0.76, 0.12], "JPY|MXN": [-0.66, 0.32, -0.66], "JPY|UST": [-0.11, 0.65, 0.58], "JPY|USD": [-0.46, 0.66, -0.16], "JPY|OIL": [0.15, 0.7, 0.36], "JPY|SILVER": [0.27, 0.74, 0.37], "CHF|SPX": [0.06, 0.56, 0.16], "CHF|NDX": [0.03, 0.53, 0.18], "CHF|DAX": [-0.0, 0.58, -0.27], "CHF|NKY": [-0.15, 0.56, -0.22], "CHF|ETH": [-0.1, 0.57, 0.25], "CHF|MXN": [-0.18, 0.73, -0.36], "CHF|COPPER": [0.01, 0.63, 0.75], "CHF|UST": [-0.75, 0.1, -0.21], "CHF|GOLD": [-0.01, 0.54, 0.73], "CHF|JPY": [-0.4, 0.2, -0.2], "CHF|USD": [-0.92, 0.28, -0.83], "CHF|OIL": [0.05, 0.54, 0.39], "CHF|SILVER": [0.24, 0.65, 0.51], "USD|UST": [-1.93, -0.41, -1.66], "OIL|SPX": [-0.79, -0.27, -0.4], "OIL|UST": [-0.83, 0.04, -0.42], "OIL|USD": [-1.36, -0.35, -1.99], "OIL|SILVER": [-0.86, -0.36, -0.38], "SILVER|SPX": [-0.77, -0.22, -1.26], "SILVER|UST": [-0.01, 0.74, -0.04], "SILVER|USD": [-0.53, 0.5, -0.56]}}}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("chartdata").textContent);
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = (v, d = 1) => (v == null || isNaN(v)) ? "–" : (v > 0 ? "+" : "") + v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const charts = [];
+  const seriesColor = (i) => css("--s" + (i + 1));
+
+  // Vertikale Markierungslinie (Signalzeitpunkt / Beginn Out-of-Sample)
+  const markerPlugin = {
+    id: "marker",
+    afterDatasetsDraw(chart, args, opts) {
+      if (opts == null || opts.index == null) return;
+      const x = chart.scales.x.getPixelForValue(opts.index);
+      const { top, bottom } = chart.chartArea;
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = css("--ink-2"); ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+      if (opts.label) { ctx.setLineDash([]); ctx.fillStyle = css("--ink-2"); ctx.font = "12px " + css("--font-data"); ctx.fillText(opts.label, x + 6, top + 12); }
+      ctx.restore();
+    }
+  };
+  // Fadenkreuz beim Hover
+  const crosshair = {
+    id: "crosshair",
+    afterDraw(chart) {
+      const a = chart.tooltip && chart.tooltip.getActiveElements();
+      if (!a || !a.length) return;
+      const x = a[0].element.x, { top, bottom } = chart.chartArea, ctx = chart.ctx;
+      ctx.save(); ctx.strokeStyle = css("--baseline"); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+    }
+  };
+
+  function baseOptions(yTitle, xTitle, unit) {
+    return {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { position: "top", align: "start", labels: { color: css("--ink-2"), boxWidth: 14, boxHeight: 3, font: { family: css("--font-data"), size: 12 } } },
+        tooltip: { backgroundColor: css("--surface"), titleColor: css("--ink"), bodyColor: css("--ink"), borderColor: css("--rule"), borderWidth: 1,
+          titleFont: { family: css("--font-data") }, bodyFont: { family: css("--font-data") }, padding: 10,
+          callbacks: { label: (c) => " " + c.dataset.label + ": " + fmt(c.parsed.y, unit === "x" ? 2 : 1) + (unit && unit !== "x" ? " " + unit : "") } }
+      },
+      scales: {
+        x: { title: { display: !!xTitle, text: xTitle, color: css("--muted"), font: { family: css("--font-data"), size: 12 } },
+             ticks: { color: css("--muted"), maxRotation: 0, autoSkipPadding: 18, font: { family: css("--font-data"), size: 11 } }, grid: { color: css("--grid") }, border: { color: css("--baseline") } },
+        y: { title: { display: !!yTitle, text: yTitle, color: css("--muted"), font: { family: css("--font-data"), size: 12 } },
+             ticks: { color: css("--muted"), font: { family: css("--font-data"), size: 11 } }, grid: { color: (c) => c.tick && c.tick.value === 0 ? css("--baseline") : css("--grid") }, border: { display: false } }
+      },
+      elements: { line: { borderWidth: 2, tension: 0 }, point: { radius: 0, hoverRadius: 5, hitRadius: 8 } }
+    };
+  }
+  function lineChart(id, labels, series, o) {
+    const el = document.getElementById(id); if (!el) return;
+    const opts = baseOptions(o.yTitle, o.xTitle, o.unit);
+    if (o.marker) opts.plugins.marker = o.marker;
+    const mk = () => series.map((s, i) => ({ label: s.name, data: s.y, borderColor: seriesColor(i), backgroundColor: seriesColor(i),
+      pointRadius: o.points ? 4 : 0, pointHoverRadius: 6 }));
+    const ch = new Chart(el, { type: "line", data: { labels, datasets: mk() }, options: opts, plugins: [markerPlugin, crosshair] });
+    ch._rebuild = () => { const fresh = baseOptions(o.yTitle, o.xTitle, o.unit); if (o.marker) fresh.plugins.marker = o.marker; ch.options = fresh; ch.data.datasets.forEach((d, i) => { d.borderColor = seriesColor(i); d.backgroundColor = seriesColor(i); }); ch.update(); };
+    charts.push(ch); return ch;
+  }
+  function dataTable(holder, head, rows) {
+    const el = document.getElementById(holder); if (!el) return;
+    const t = document.createElement("table");
+    t.innerHTML = "<thead><tr>" + head.map(h => "<th>" + h + "</th>").join("") + "</tr></thead><tbody>" + rows.map(r => "<tr>" + r.map(c => "<td>" + c + "</td>").join("") + "</tr>").join("") + "</tbody>";
+    el.appendChild(t);
+  }
+  function divColor(v, lim) {
+    const t = Math.max(-1, Math.min(1, v / lim));
+    const mid = css("--div-mid").split(",").map(Number), end = css(t < 0 ? "--div-neg" : "--div-pos").split(",").map(Number);
+    const a = Math.abs(t) * 0.85;
+    return "rgb(" + mid.map((m, i) => Math.round(m + (end[i] - m) * a)).join(",") + ")";
+  }
+
+  // 1) Ereignisstudie
+  if (D.event_riskoff && document.getElementById("c-event")) {
+    let mode = "riskoff";
+    const ev = () => D["event_" + mode];
+    const zeroIdx = ev().x.indexOf(0);
+    const ch = lineChart("c-event", ev().x, ev().series, { yTitle: "bps relativ zum Signal", xTitle: "Stunden relativ zum Signal", unit: "bps", marker: { index: zeroIdx, label: "Signal" } });
+    document.querySelectorAll("#seg-event button").forEach(b => b.addEventListener("click", () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll("#seg-event button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      ch.data.labels = ev().x; ev().series.forEach((s, i) => ch.data.datasets[i].data = s.y); ch.update();
+    }));
+    const pick = [-12, -4, -1, 0, 1, 2, 4, 8, 24, 48];
+    ["riskoff", "riskon"].forEach(m => {
+      const e = D["event_" + m];
+      dataTable("t-event-" + m, ["Stunde"].concat(e.series.map(s => s.name)), pick.map(h => { const i = e.x.indexOf(h); return [h].concat(e.series.map(s => fmt(s.y[i]))); }));
+    });
+  }
+  // 2) Equity-Kurven
+  if (D.equity && document.getElementById("c-equity")) {
+    const idx = D.equity.x.findIndex(d => d >= "2023-01-01");
+    lineChart("c-equity", D.equity.x.map(d => d.slice(0, 7)), D.equity.series, { yTitle: "kumulierte Rendite in %", unit: "%", marker: { index: idx, label: "Out-of-Sample" } });
+    const yrs = {}; D.equity.x.forEach((d, i) => { yrs[d.slice(0, 4)] = i; });
+    dataTable("t-equity", ["Jahresende"].concat(D.equity.series.map(s => s.name)), Object.entries(yrs).map(([y, i]) => [y].concat(D.equity.series.map(s => fmt(s.y[i]) + " %"))));
+  }
+  // 3) Latenz & Kosten
+  if (D.latency && document.getElementById("c-latency")) {
+    lineChart("c-latency", D.latency.x.map(h => h + " h"), D.latency.series, { yTitle: "Sharpe Ratio", xTitle: "Einstieg verzögert um", unit: "x", points: true });
+    dataTable("t-latency", ["Verzögerung"].concat(D.latency.series.map(s => s.name)), D.latency.x.map((h, i) => [h + " h"].concat(D.latency.series.map(s => fmt(s.y[i], 2)))));
+  }
+  // 5) Muster-Häufigkeit
+  if (D.patterns && document.getElementById("c-patterns")) {
+    lineChart("c-patterns", D.patterns.x.map(String), D.patterns.series, { yTitle: "Tage pro Jahr", unit: "Tage", points: true });
+    dataTable("t-patterns", ["Jahr"].concat(D.patterns.series.map(s => s.name)), D.patterns.x.map((y, i) => [y].concat(D.patterns.series.map(s => s.y[i]))));
+  }
+  // 6) Folgetag-Heatmap
+  function buildFollow() {
+    const el = document.getElementById("h-follow"); if (!el || !D.followthrough) return;
+    const f = D.followthrough; const lim = 1.0;
+    let h = "<table class='heat'><thead><tr><th class='rowh'>Muster am Tag 0 (Anzahl Tage)</th>" + f.assets.map(a => "<th>" + a + "</th>").join("") + "</tr></thead><tbody>";
+    f.rows.forEach(r => {
+      h += "<tr><th class='rowh'>" + r.pattern + " <span style='color:var(--muted)'>(" + r.n + ")</span></th>" + r.vals.map(v =>
+        "<td style='background:" + divColor(v.m, lim) + "' title='" + r.pattern + " → " + v.a + " am Folgetag: " + fmt(v.m, 2) + " % (t = " + fmt(v.t, 1) + ")'>" + fmt(v.m, 2) + (Math.abs(v.t) >= 1.96 ? "*" : "") + "</td>").join("") + "</tr>";
+    });
+    el.innerHTML = h + "</tbody></table>";
+  }
+  // 4) Paar-Matrix
+  function buildPairs() {
+    const el = document.getElementById("h-pairs"); if (!el || !D.pairs) return;
+    const k = D.pairs.keys, m = D.pairs.m; const lim = 2.5;
+    const get = (a, b) => m[a + "|" + b] || m[b + "|" + a];
+    let h = "<table class='heat'><thead><tr><th class='rowh'></th>" + k.map(a => "<th>" + a + "</th>").join("") + "</tr></thead><tbody>";
+    k.forEach(a => {
+      h += "<tr><th class='rowh'>" + a + "</th>" + k.map(b => {
+        if (a === b) return "<td></td>";
+        const v = get(a, b); if (!v) return "<td>–</td>";
+        return "<td style='background:" + divColor(v[0], lim) + "' title='" + a + " ↔ " + b + ": Sharpe netto " + fmt(v[0], 2) + ", brutto " + fmt(v[1], 2) + ", Out-of-Sample netto " + fmt(v[2], 2) + "'>" + fmt(v[0], 1) + "</td>";
+      }).join("") + "</tr>";
+    });
+    el.innerHTML = h + "</tbody></table>";
+  }
+  buildFollow(); buildPairs();
+
+  // Theme-Wechsel: Farben neu lesen
+  const rerender = () => { charts.forEach(c => c._rebuild && c._rebuild()); buildFollow(); buildPairs(); };
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender); } catch (e) {}
+  new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

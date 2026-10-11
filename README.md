@@ -6,8 +6,22 @@ und gewinnbringend auf den fahrenden Zug aufspringen?** Fokus: Intraday (Stunden
 vollautomatische Ausführung, Retail-Konto (50–250 k€), freie Daten.
 
 - **Bericht:** [`reports/Kapitalrotation und Money Flow Trading.md`](reports/Kapitalrotation%20und%20Money%20Flow%20Trading.md)
+  (interaktive Fassung: [`reports/money_flow_trading.html`](reports/money_flow_trading.html), gebaut mit `reports/build/build.py`)
 - **Recherche-Notizen (Quellen):** [`research_notes/Kapitalrotation und Money Flow Trading/`](research_notes/Kapitalrotation%20und%20Money%20Flow%20Trading/)
 - **Ergebnisse (CSV/JSON) & Grafiken:** [`results/`](results/)
+
+## Kernergebnisse (Stundendaten 07/2019–09/2026, nach Kosten)
+
+| Ansatz | Sharpe In-Sample (bis 2022) | Sharpe Out-of-Sample (ab 2023) |
+|---|---|---|
+| Rotation erkennen und folgen (900 Varianten) | alle negativ (bestes −0,29) | Mittel −0,46 |
+| Ausgangsidee: Risk-off → Gold + T-Bonds long, BTC + Nasdaq short | −0,58 | −0,45 |
+| Gegenhalten nach Panik (z ≥ 3, 2 h warten, Verlierer 24 h kaufen) | +0,86 | +0,36 |
+| Risk-on-Momentum S&P/Nasdaq-Futures (z ≥ 3, 4 h) – nachträglich formuliert | +0,36 | +1,62 |
+| Tagesbasis: Cross-Asset-Momentum 60–250 Tage (ETF, 2007–2026) | 0,63–0,72 | 0,70–0,78 |
+
+Beim Auslösen eines Risk-off-Signals sind 90–100 % der Bewegung bereits gelaufen; danach bleiben im Mittel
+0–3 bps Fortsetzung – weniger als ein Round-Trip kostet. Details, Quellen und Vorbehalte im Bericht.
 
 ## Aufbau
 
