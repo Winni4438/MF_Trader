@@ -42,7 +42,7 @@ for ax, nm, title in [(axes[0], "riskoff", "Nach einem Risk-off-Signal"), (axes[
     ax.axhline(0, color=BASE, lw=1)
     ax.set_title(title)
     ax.set_xlabel("Stunden relativ zum Signal (Signal = 0)")
-    ax.set_ylabel("kumulierte Überrendite ggü. Normal-Drift (bps)")
+    ax.set_ylabel("Kurs relativ zum Signal (bps)\nnach dem Signal: Überrendite ggü. Normal-Drift")
     ax.text(0.5, 0.02, "links: Bewegung VOR dem Signal · rechts: was danach noch kommt", transform=ax.transAxes,
             ha="center", color=MUTED, fontsize=8)
 axes[0].legend(loc="upper left", fontsize=8, ncol=2)
@@ -50,8 +50,11 @@ save(fig, "01_ereignisstudie.png")
 
 # 2) Equity-Kurven der Referenzstrategien (netto)
 eq = pd.read_csv(RH / "equity_curves_daily_cum.csv", index_col=0, parse_dates=True)
+if (RH / "extra_equity_momentum_curve.csv").exists():
+    eq = eq.join(pd.read_csv(RH / "extra_equity_momentum_curve.csv", index_col=0, parse_dates=True), how="outer").ffill()
 pick = [c for c in ["Nutzer-Idee: Gold+Bonds long / BTC+NDX short", "RF Basis (long Ziel, 4h, z2.5, EOD)",
-                    "RF + Short Quelle", "RF Risk-off nur US-Sitzung", "Gegenhalten (IS-Optimum)"] if c in eq]
+                    "RF + Short Quelle", "RF Risk-off nur US-Sitzung", "Gegenhalten (IS-Optimum)",
+                    "Risk-on-Momentum Aktienindex (z≥3, 4h)"] if c in eq]
 fig, ax = plt.subplots(figsize=(12, 4.6))
 for i, c in enumerate(pick):
     ax.plot(eq.index, eq[c] * 100, color=C[i], lw=1.6, label=c)
@@ -100,7 +103,7 @@ for i in range(len(keys)):
         if np.isfinite(v):
             ax.text(j, i, f"{v:.1f}", ha="center", va="center", fontsize=6.5, color=INK)
 fig.colorbar(im, ax=ax, shrink=0.8, label="Sharpe netto (Folgen des Paar-Flows, 8h)")
-ax.set_title("Welche Paar-Rotation lohnt sich intraday? (blau = Folgen profitabel, rot = Gegenhalten wäre besser)")
+ax.set_title("Paar-Rotationen intraday: Sharpe nach Kosten\n(blau = Folgen lohnt, rot = Folgen verliert)")
 save(fig, "04_paar_matrix_intraday.png")
 
 # 5) Muster-Häufigkeit pro Jahr (Tagesdaten)

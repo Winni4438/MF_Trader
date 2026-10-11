@@ -10,3 +10,17 @@
 [     8s] riskoff Ereignisse: 528
 [     8s] riskon Ereignisse: 382
 [     8s] Gitter Rotation Follower
+[   345s] Gitter: 900 Kombinationen
+[   345s] Beste IS-Konfiguration: {'window': 8, 'theta': 2.0, 'max_hold': 4, 'exit_window': 2, 'src_k': 2, 'eod_flat': True, 'filter': 'US-Sitzung', 'Sharpe_IS': -0.29124098803232007, 'Sharpe_OOS': -0.40052170933911896}
+[   345s] Referenzvarianten
+[   350s] Fader-Gitter
+[   392s] Bester Fader IS: {'theta': 3.0, 'wait': 2, 'hold': 24, 'hedge': False, 'direction': 'off', 'Sharpe_IS': 0.8608203794248523, 'Sharpe_OOS': 0.3597894939936662}
+[   393s] Placebo-Tests
+[   503s] Placebo: {'Gegenhalten': {'real': 0.6317103078257558, 'placebo_mean': -0.022390512470649587, 'pctl': 0.945}, 'Folgen US-Sitzung (Risk-off)': {'real': -1.4705632104446107, 'placebo_mean': -0.6401143860093984, 'pctl': 0.01}}
+[   503s] Latenz/Kosten
+[   505s] XS-Momentum
+[   525s] Paar-Matrix
+[   555s] Intraday-Momentum letzte Stunde
+[   555s] Krypto-Extras
+[   556s] Häufigkeiten
+[   556s] FERTIG

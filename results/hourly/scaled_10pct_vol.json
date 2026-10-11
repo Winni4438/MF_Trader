@@ -1,0 +1,26 @@
+{
+ "RF Basis (long Ziel, 4h, z2.5, EOD)": {
+  "CAGR@10%Vol": -0.0733,
+  "MaxDD@10%Vol": -0.489,
+  "Sharpe": -0.71,
+  "Hebel_vs_5%Bein": 3.1
+ },
+ "Nutzer-Idee: Gold+Bonds long / BTC+NDX short": {
+  "CAGR@10%Vol": -0.0545,
+  "MaxDD@10%Vol": -0.356,
+  "Sharpe": -0.51,
+  "Hebel_vs_5%Bein": 3.0
+ },
+ "Gegenhalten (IS-Optimum)": {
+  "CAGR@10%Vol": 0.0595,
+  "MaxDD@10%Vol": -0.213,
+  "Sharpe": 0.63,
+  "Hebel_vs_5%Bein": 2.2
+ },
+ "Risk-on-Momentum Aktienindex (z≥3, 4h)": {
+  "CAGR@10%Vol": 0.1023,
+  "MaxDD@10%Vol": -0.14,
+  "Sharpe": 1.02,
+  "Hebel_vs_5%Bein": 5.2
+ }
+}

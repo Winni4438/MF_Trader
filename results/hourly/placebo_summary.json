@@ -1,0 +1,12 @@
+{
+  "Gegenhalten": {
+    "real": 0.6317103078257558,
+    "placebo_mean": -0.022390512470649587,
+    "pctl": 0.945
+  },
+  "Folgen US-Sitzung (Risk-off)": {
+    "real": -1.4705632104446107,
+    "placebo_mean": -0.6401143860093984,
+    "pctl": 0.01
+  }
+}
