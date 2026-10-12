@@ -1,0 +1,290 @@
+<title>Überhitzte Märkte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ruhiger Lesefluss in einer Textspalte (~68ch), Abbildungen dürfen breiter laufen; Kennzahlenleiste oben. */
+:root {
+  --bg: #f3f5f2;          /* Seite: kühles Grau mit grünem Stich */
+  --surface: #fcfcfb;     /* Diagramm-/Kartenfläche */
+  --ink: #15201d;         /* Fließtext */
+  --ink-2: #4d5853;       /* Nebentext */
+  --muted: #7b8580;       /* Achsen, Labels */
+  --rule: #dde2dd;        /* Haarlinien */
+  --accent: #8a5a12;      /* Bronze: 'Geld fließt' – sparsam für Akzente */
+  --accent-soft: #f1e7d6;
+  --neg: #c23b3b;
+  --pos: #1d6fc4;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300;
+  --grid: #e1e0d9; --baseline: #c3c2b7;
+  --div-neg: 227, 73, 72; --div-pos: 42, 120, 214; --div-mid: 240, 239, 236;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure: 68ch;
+  --wide: 1080px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #1a1a19; --ink: #e8ece9; --ink-2: #b9c1bc; --muted: #8e9792; --rule: #2c312e;
+    --accent: #d9a35a; --accent-soft: #2e2618; --neg: #e66767; --pos: #5a9be8;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+    --grid: #2c2c2a; --baseline: #383835;
+    --div-neg: 230, 103, 103; --div-pos: 57, 135, 229; --div-mid: 56, 56, 53;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #1a1a19; --ink: #e8ece9; --ink-2: #b9c1bc; --muted: #8e9792; --rule: #2c312e;
+  --accent: #d9a35a; --accent-soft: #2e2618; --neg: #e66767; --pos: #5a9be8;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
+  --grid: #2c2c2a; --baseline: #383835;
+  --div-neg: 230, 103, 103; --div-pos: 57, 135, 229; --div-mid: 56, 56, 53;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.62; }
+.page { padding-inline: 20px; padding-block: 40px 80px; display: flex; flex-direction: column; align-items: center; }
+.col { width: 100%; max-width: var(--measure); min-width: 0; }
+.wide { width: 100%; max-width: var(--wide); min-width: 0; }
+header.hero { width: 100%; max-width: var(--wide); display: grid; gap: 14px; padding-block: 8px 28px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1, h2, h3, h4 { font-family: var(--font-display); font-stretch: 88%; color: var(--ink); text-wrap: balance; line-height: 1.15; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; letter-spacing: -.015em; margin: 0; }
+.dek { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.byline { font-family: var(--font-data); font-size: 12.5px; color: var(--muted); }
+.glance { width: 100%; max-width: var(--wide); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; margin-bottom: 36px; }
+.glance div { background: var(--surface); padding: 16px 18px; display: grid; gap: 4px; align-content: start; }
+.glance b { font-family: var(--font-display); font-stretch: 90%; font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+.glance span { font-size: 14.5px; color: var(--ink-2); line-height: 1.45; }
+.glance .tag { font-family: var(--font-data); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+nav.toc { width: 100%; max-width: var(--wide); border-left: 2px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 30px; }
+nav.toc p { margin: 0 0 6px; font-family: var(--font-data); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+nav.toc ol { margin: 0; padding-left: 20px; display: grid; gap: 3px; font-size: 15.5px; }
+nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+nav.toc a:hover, nav.toc a:focus-visible { border-bottom-color: var(--accent); }
+article { width: 100%; max-width: var(--wide); display: flex; flex-direction: column; align-items: flex-start; }
+article > * { width: 100%; max-width: var(--measure); min-width: 0; }
+article h2 { font-size: 30px; font-weight: 750; margin: 52px 0 10px; padding-top: 14px; border-top: 1px solid var(--rule); }
+article h3 { font-size: 21px; font-weight: 700; margin: 30px 0 6px; }
+article h4 { font-size: 17px; font-weight: 700; margin: 22px 0 4px; }
+article p, article li { color: var(--ink); }
+article p.lead { font-size: 19px; line-height: 1.6; color: var(--ink); padding-bottom: 6px; }
+article p > em:only-child { font-size: 14px; color: var(--ink-2); }
+article a { color: var(--accent); text-underline-offset: 2px; word-break: break-word; }
+article strong { font-weight: 600; }
+article blockquote { margin: 18px 0; padding: 10px 18px; background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 0 4px 4px 0; color: var(--ink); }
+article code { font-family: var(--font-data); font-size: .86em; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; }
+article pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; overflow-x: auto; font-size: 13.5px; }
+article pre code { border: 0; padding: 0; background: none; }
+article hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+.tablewrap { overflow-x: auto; margin: 16px 0; max-width: var(--wide) !important; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-family: var(--font-body); }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--font-display); font-stretch: 90%; font-weight: 650; font-size: 13.5px; color: var(--ink-2); background: var(--bg); }
+td { font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+figure.chart { max-width: var(--wide) !important; width: 100%; margin: 26px 0 30px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 18px 12px; display: grid; gap: 10px; }
+figure.chart figcaption { display: grid; gap: 3px; }
+figure.chart figcaption b { font-family: var(--font-display); font-stretch: 90%; font-size: 17px; color: var(--ink); }
+figure.chart figcaption span { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+.chartbox { position: relative; height: 340px; min-width: 0; }
+.chartbox.tall { height: 400px; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.duo h4 { margin: 0 0 4px; font-family: var(--font-display); font-size: 14px; color: var(--ink-2); font-weight: 650; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; width: fit-content; }
+.seg button { font: 500 13px var(--font-data); background: var(--surface); color: var(--ink-2); border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+details.data { font-size: 13.5px; color: var(--ink-2); }
+details.data summary { cursor: pointer; font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+details.data .tablewrap { margin: 8px 0 0; }
+.heat td, .heat th { text-align: center; padding: 6px 6px; font-family: var(--font-data); font-size: 12px; white-space: nowrap; }
+.heat th.rowh { text-align: left; font-family: var(--font-display); font-size: 12.5px; }
+.heat td { color: var(--ink); }
+.legend-div { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); font-family: var(--font-data); flex-wrap: wrap; }
+.legend-div i { display: inline-block; width: 120px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, rgb(var(--div-neg)), rgb(var(--div-mid)), rgb(var(--div-pos))); }
+.fallback-img { width: 100%; height: auto; border-radius: 4px; }
+footer.note { width: 100%; max-width: var(--wide); margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--ink-2); }
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .page { padding-inline: 16px; padding-block: 24px 56px; }
+  article h2 { font-size: 25px; }
+  .chartbox { height: 300px; }
+  figure.chart { padding: 12px 10px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">Folgestudie · Mean Reversion · Haltedauer höchstens 2 Tage · Stand Oktober 2026</div>
+    <h1>Überhitzte Märkte</h1>
+    <p class="dek">Zeigen Überhitzung und Unterkühlung zuverlässiger als Raten an, wo der Markt umkehrt, etwa Bitcoin überkauft und Gold überverkauft? Recherche aus drei Blickwinkeln plus Backtests über 42 Märkte stündlich und 63 Märkte täglich seit 2007.</p>
+    <div class="byline">42 Märkte stündlich 2019–2026 · 63 Märkte täglich 2007–2026 · rund 2.000 getestete Varianten · Kosten, Verzögerung, Placebo- und Ausschlusstests</div>
+  </header>
+  <section class="glance" aria-label="Auf einen Blick">
+    <div><span class="tag">Deine RSI-Idee wörtlich</span><b>Sharpe −0,05</b><span>Tages-RSI(14) 70/30 über alle Paare, 2007–2026 nach Kosten. Seit 2017 negativ.</span></div>
+    <div><span class="tag">Überkauft shorten</span><b>−1,8</b><span>mittlere Sharpe über alle Klassen. Euphorie läuft öfter weiter, als sie kippt.</span></div>
+    <div><span class="tag">Kandidat A</span><b>Sharpe 1,21</b><span>Dip-Kauf in US-Index-Futures nach Kassaschluss nahe am Tagestief. Seit 2007 belegt, schlägt alle Placebos.</span></div>
+    <div><span class="tag">Kandidat B</span><b>Sharpe 0,79</b><span>Überkaufte Häfen gegen überverkaufte Aktien (RSI 96 h). Robust, aber 94 % des Gewinns aus 5 Tagen.</span></div>
+  </section>
+  <nav class="toc" aria-label="Inhalt"><p>Inhalt</p><ol>%%TOC%%</ol></nav>
+  <article>
+%%BODY%%
+  </article>
+  <footer class="note">
+    Fortsetzung des Berichts <a href="https://claude.ai/artifact/2oFLQamUdStv2yT1rdrHK9" style="color:var(--accent)">Money Flow Trading</a>. Code, Daten-Pipeline und alle Rohergebnisse liegen im Repository <code>Winni4438/MF_Trader</code> (Branch <code>claude/blissful-gates-12gd63</code>): <code>mf_trader/</code>, <code>scripts/</code>, <code>results/</code>. Reine Forschung, keine Anlageberatung.
+  </footer>
+</div>
+<script id="chartdata" type="application/json">%%DATA%%</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("chartdata").textContent);
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = (v, d = 1) => (v == null || isNaN(v)) ? "–" : (v > 0 ? "+" : "") + v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const charts = [];
+  const seriesColor = (i) => css("--s" + (i + 1));
+
+  // Vertikale Markierungslinie (Signalzeitpunkt / Beginn Out-of-Sample)
+  const markerPlugin = {
+    id: "marker",
+    afterDatasetsDraw(chart, args, opts) {
+      if (opts == null || opts.index == null) return;
+      const x = chart.scales.x.getPixelForValue(opts.index);
+      const { top, bottom } = chart.chartArea;
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.strokeStyle = css("--ink-2"); ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+      if (opts.label) { ctx.setLineDash([]); ctx.fillStyle = css("--ink-2"); ctx.font = "12px " + css("--font-data"); ctx.fillText(opts.label, x + 6, top + 12); }
+      ctx.restore();
+    }
+  };
+  // Fadenkreuz beim Hover
+  const crosshair = {
+    id: "crosshair",
+    afterDraw(chart) {
+      const a = chart.tooltip && chart.tooltip.getActiveElements();
+      if (!a || !a.length) return;
+      const x = a[0].element.x, { top, bottom } = chart.chartArea, ctx = chart.ctx;
+      ctx.save(); ctx.strokeStyle = css("--baseline"); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+    }
+  };
+
+  function baseOptions(yTitle, xTitle, unit) {
+    return {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { position: "top", align: "start", labels: { color: css("--ink-2"), boxWidth: 14, boxHeight: 3, font: { family: css("--font-data"), size: 12 } } },
+        tooltip: { backgroundColor: css("--surface"), titleColor: css("--ink"), bodyColor: css("--ink"), borderColor: css("--rule"), borderWidth: 1,
+          titleFont: { family: css("--font-data") }, bodyFont: { family: css("--font-data") }, padding: 10,
+          callbacks: { label: (c) => " " + c.dataset.label + ": " + fmt(c.parsed.y, unit === "x" ? 2 : 1) + (unit && unit !== "x" ? " " + unit : "") } }
+      },
+      scales: {
+        x: { title: { display: !!xTitle, text: xTitle, color: css("--muted"), font: { family: css("--font-data"), size: 12 } },
+             ticks: { color: css("--muted"), maxRotation: 0, autoSkipPadding: 18, font: { family: css("--font-data"), size: 11 } }, grid: { color: css("--grid") }, border: { color: css("--baseline") } },
+        y: { title: { display: !!yTitle, text: yTitle, color: css("--muted"), font: { family: css("--font-data"), size: 12 } },
+             ticks: { color: css("--muted"), font: { family: css("--font-data"), size: 11 } }, grid: { color: (c) => c.tick && c.tick.value === 0 ? css("--baseline") : css("--grid") }, border: { display: false } }
+      },
+      elements: { line: { borderWidth: 2, tension: 0 }, point: { radius: 0, hoverRadius: 5, hitRadius: 8 } }
+    };
+  }
+  function lineChart(id, labels, series, o) {
+    const el = document.getElementById(id); if (!el) return;
+    const opts = baseOptions(o.yTitle, o.xTitle, o.unit);
+    if (o.marker) opts.plugins.marker = o.marker;
+    const mk = () => series.map((s, i) => ({ label: s.name, data: s.y, borderColor: seriesColor(i), backgroundColor: seriesColor(i),
+      pointRadius: o.points ? 4 : 0, pointHoverRadius: 6 }));
+    const ch = new Chart(el, { type: "line", data: { labels, datasets: mk() }, options: opts, plugins: [markerPlugin, crosshair] });
+    ch._rebuild = () => { const fresh = baseOptions(o.yTitle, o.xTitle, o.unit); if (o.marker) fresh.plugins.marker = o.marker; ch.options = fresh; ch.data.datasets.forEach((d, i) => { d.borderColor = seriesColor(i); d.backgroundColor = seriesColor(i); }); ch.update(); };
+    charts.push(ch); return ch;
+  }
+  function dataTable(holder, head, rows) {
+    const el = document.getElementById(holder); if (!el) return;
+    const t = document.createElement("table");
+    t.innerHTML = "<thead><tr>" + head.map(h => "<th>" + h + "</th>").join("") + "</tr></thead><tbody>" + rows.map(r => "<tr>" + r.map(c => "<td>" + c + "</td>").join("") + "</tr>").join("") + "</tbody>";
+    el.appendChild(t);
+  }
+  function divColor(v, lim) {
+    const t = Math.max(-1, Math.min(1, v / lim));
+    const mid = css("--div-mid").split(",").map(Number), end = css(t < 0 ? "--div-neg" : "--div-pos").split(",").map(Number);
+    const a = Math.abs(t) * 0.85;
+    return "rgb(" + mid.map((m, i) => Math.round(m + (end[i] - m) * a)).join(",") + ")";
+  }
+
+  function barChart(id, labels, series, o) {
+    const el = document.getElementById(id); if (!el) return;
+    const mk = () => series.map((s, i) => ({ label: s.name, data: s.y, backgroundColor: seriesColor(i), borderRadius: 3, borderSkipped: false, barPercentage: 0.8, categoryPercentage: 0.7 }));
+    const opts = () => {
+      const b = baseOptions(o.yTitle, o.xTitle, "x");
+      b.indexAxis = o.horizontal ? "y" : "x";
+      b.interaction = { mode: "index", intersect: false };
+      if (o.horizontal) { const t = b.scales.x; b.scales.x = b.scales.y; b.scales.y = t; b.scales.y.grid = { display: false }; b.scales.x.title = { display: true, text: o.yTitle, color: css("--muted"), font: { family: css("--font-data"), size: 12 } }; b.scales.y.title = { display: false }; }
+      b.plugins.tooltip.callbacks.label = (c) => " " + c.dataset.label + ": " + fmt(o.horizontal ? c.parsed.x : c.parsed.y, 2);
+      return b;
+    };
+    const ch = new Chart(el, { type: "bar", data: { labels, datasets: mk() }, options: opts() });
+    ch._rebuild = () => { ch.options = opts(); ch.data.datasets.forEach((d, i) => d.backgroundColor = seriesColor(i)); ch.update(); };
+    charts.push(ch); return ch;
+  }
+  // Familien-Überblick
+  if (D.families) {
+    barChart("c-families", D.families.labels, D.families.series, { yTitle: "mittlere Sharpe Ratio nach Kosten", horizontal: true });
+    dataTable("t-families", ["Familie", "Varianten"].concat(D.families.series.map(s => s.name)), D.families.labels.map((l, i) => [l, D.families.n[i]].concat(D.families.series.map(s => fmt(s.y[i], 2)))));
+  }
+  // IBS-Kurven
+  if (D.ibs_curve) {
+    const idx = D.ibs_curve.x.findIndex(d => d >= "2023-01-01");
+    lineChart("c-ibs", D.ibs_curve.x.map(d => d.slice(0, 7)), D.ibs_curve.series, { yTitle: "kumuliert in % (10 % Vol.)", unit: "%", marker: { index: idx, label: "Test ab 2023" } });
+    const yrs = {}; D.ibs_curve.x.forEach((d, i) => { yrs[d.slice(0, 4)] = i; });
+    dataTable("t-ibs", ["Jahresende"].concat(D.ibs_curve.series.map(s => s.name)), Object.entries(yrs).map(([y, i]) => [y].concat(D.ibs_curve.series.map(s => fmt(s.y[i]) + " %"))));
+  }
+  if (D.ibs_index) {
+    barChart("c-ibs-index", D.ibs_index.labels, D.ibs_index.series, { yTitle: "Sharpe nach Kosten" });
+    dataTable("t-ibs-index", ["Index"].concat(D.ibs_index.series.map(s => s.name)), D.ibs_index.labels.map((l, i) => [l].concat(D.ibs_index.series.map(s => fmt(s.y[i], 2)))));
+  }
+  // Paar-Kurven
+  if (D.pair_curve) {
+    const idx = D.pair_curve.x.findIndex(d => d >= "2023-01-01");
+    lineChart("c-pairs", D.pair_curve.x.map(d => d.slice(0, 7)), D.pair_curve.series, { yTitle: "kumuliert in % (10 % Vol.)", unit: "%", marker: { index: idx, label: "Test ab 2023" } });
+    const yrs = {}; D.pair_curve.x.forEach((d, i) => { yrs[d.slice(0, 4)] = i; });
+    dataTable("t-pairs", ["Jahresende"].concat(D.pair_curve.series.map(s => s.name)), Object.entries(yrs).map(([y, i]) => [y].concat(D.pair_curve.series.map(s => fmt(s.y[i]) + " %"))));
+  }
+  // Heatmaps
+  let gridMode = "Sharpe_OOS";
+  function heatTable(el, rows, cols, vals, lim, title, firstHead) {
+    let h = "<table class='heat'><thead><tr><th class='rowh'>" + (firstHead || "") + "</th>" + cols.map(c => "<th>" + c + "</th>").join("") + "</tr></thead><tbody>";
+    rows.forEach((r, i) => {
+      h += "<tr><th class='rowh'>" + r + "</th>" + cols.map((c, j) => {
+        const v = vals[i][j];
+        if (v === null || v === undefined || isNaN(v)) return "<td title='zu wenige Signale'>–</td>";
+        return "<td style='background:" + divColor(v, lim) + "' title='" + title(r, c, v) + "'>" + fmt(v, 2) + "</td>";
+      }).join("") + "</tr>";
+    });
+    el.innerHTML = h + "</tbody></table>";
+  }
+  function buildClassdir() {
+    const el = document.getElementById("h-classdir"); if (!el || !D.classdir) return;
+    heatTable(el, D.classdir.rows, D.classdir.cols, D.classdir.v, 1.5, (r, c, v) => r + ", " + c + ": Sharpe " + fmt(v, 2), "Klasse");
+  }
+  function buildGrid() {
+    const el = document.getElementById("h-grid"); if (!el || !D.pair_grid) return;
+    heatTable(el, D.pair_grid.rows, D.pair_grid.cols, D.pair_grid[gridMode], 1.2, (r, c, v) => r + ", Abstand " + c + ": Sharpe " + fmt(v, 2), "RSI-Fenster");
+  }
+  document.querySelectorAll("#seg-grid button").forEach(b => b.addEventListener("click", () => {
+    gridMode = b.dataset.mode;
+    document.querySelectorAll("#seg-grid button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    buildGrid();
+  }));
+  function buildFollow() { buildClassdir(); }
+  function buildPairs() { buildGrid(); }
+  buildFollow(); buildPairs();
+
+  // Theme-Wechsel: Farben neu lesen
+  const rerender = () => { charts.forEach(c => c._rebuild && c._rebuild()); buildFollow(); buildPairs(); };
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender); } catch (e) {}
+  new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

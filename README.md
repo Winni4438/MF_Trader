@@ -7,6 +7,9 @@ vollautomatische Ausführung, Retail-Konto (50–250 k€), freie Daten.
 
 - **Bericht:** [`reports/Kapitalrotation und Money Flow Trading.md`](reports/Kapitalrotation%20und%20Money%20Flow%20Trading.md)
   (interaktive Fassung: [`reports/money_flow_trading.html`](reports/money_flow_trading.html), gebaut mit `reports/build/build.py`)
+- **Folgebericht „Überhitzung und relative Mean Reversion“** (Haltedauer ≤ 2 Tage):
+  [`reports/Überhitzung und relative Mean Reversion.md`](reports/%C3%9Cberhitzung%20und%20relative%20Mean%20Reversion.md)
+  (interaktiv: [`reports/ueberhitzte_maerkte.html`](reports/ueberhitzte_maerkte.html), gebaut mit `reports/build_meanrev/build.py`)
 - **Recherche-Notizen (Quellen):** [`research_notes/Kapitalrotation und Money Flow Trading/`](research_notes/Kapitalrotation%20und%20Money%20Flow%20Trading/)
 - **Ergebnisse (CSV/JSON) & Grafiken:** [`results/`](results/)
 
@@ -23,6 +26,15 @@ vollautomatische Ausführung, Retail-Konto (50–250 k€), freie Daten.
 Beim Auslösen eines Risk-off-Signals sind 90–100 % der Bewegung bereits gelaufen; danach bleiben im Mittel
 0–3 bps Fortsetzung – weniger als ein Round-Trip kostet. Details, Quellen und Vorbehalte im Bericht.
 
+## Kernergebnisse Folgestudie: Überhitzung / Mean Reversion (≤ 2 Tage, nach Kosten)
+
+| Ansatz | Ergebnis |
+|---|---|
+| Nutzer-Idee wörtlich: Tages-RSI(14) 70/30, alle Paare, 2007–2026 | Sharpe −0,05 (seit 2017 −0,23) |
+| 1.243 Stundenvarianten (Einzelasset, Paare, Körbe, Querschnitt, Funding) | nur 7 % in IS und OOS positiv; „überkauft shorten“ Ø −1,8 |
+| A: IBS-Dip-Kauf US-Index-Futures nach Kassaschluss (nur long, ≤ 2 Sitzungen) | Sharpe 1,21 (2019–22: 1,31, 2023–26: 1,12); ETF 2007–2026: 0,75; Placebo 100 % |
+| B: Relative RSI-Paare (RSI 96 h, ≥ 30 Pkt., ≤ 24 h, klassenübergreifend) | Sharpe 0,79 (IS 0,67, OOS 1,01), aber 94 % des Gewinns an 5 Krisentagen |
+
 ## Aufbau
 
 ```
@@ -35,6 +47,9 @@ mf_trader/
     yahoo.py         Yahoo-Chart-API (stündlich ~2 Jahre, täglich komplette Historie)
     fred.py          Makro-/Stressreihen (FRED)
     panel.py         Synchrones UTC-Stunden-Panel inkl. Roll-Bereinigung
+  overheat.py        Überhitzungs-Indikatoren (RSI auf eigenen Bars, Bollinger-z, PCA-Residuen)
+  meanrev.py         Mean-Reversion-Engines (Einzelasset, überlappende Paare, Körbe, Querschnitt)
+  stats.py           Deflated Sharpe Ratio
   flow.py            Flow-Messung: saisonal normierte Renditen, Flow-Score, RORO-Score, Breite
   regime.py          Tagesregime-Filter (Aktien-Anleihe-Korrelation, Trend, Tages-RORO)
   strategies.py      Rotation Follower, Gegenhalten (Fader), Querschnitts-Momentum, Paar-Flows
@@ -58,6 +73,13 @@ python scripts/dl_fred.py
 python scripts/run_hourly.py --rebuild   # ~30–40 min
 python scripts/run_daily.py
 python scripts/make_charts.py
+# Folgestudie Mean Reversion
+python scripts/dl_extra.py alts && python scripts/dl_extra.py funding && python scripts/dl_extra.py histdata && python scripts/dl_extra.py etf
+python scripts/dl_dukascopy.py --extra
+python scripts/run_meanrev_daily.py && python scripts/run_meanrev_hourly.py --rebuild
+python scripts/run_user_rsi_example.py && python scripts/run_dip_buying.py && python scripts/run_ibs_futures_hourly.py
+python scripts/run_ibs_placebo.py && python scripts/run_pair_rsi_deepdive.py && python scripts/run_pair_rsi_robustness.py
+python scripts/run_pair_rsi_daily_check.py && python scripts/run_pair_rsi_final.py && python scripts/make_charts_meanrev.py
 ```
 
 ## Wichtige Datenfallen (gefunden und behoben)
@@ -73,6 +95,9 @@ python scripts/make_charts.py
    einer Trefferquote von 100 % und korrigiert.
 4. **Einzel-Asset-Schocks** (z. B. US-Kupferzoll Juli 2025: +12,6 % / −18,8 % in einer Stunde)
    dürfen nicht allein eine „Rotation“ auslösen → Flow-Scores werden vor der Mittelung auf ±4 begrenzt.
+
+5. **Roll-Sprünge in Rohstoff-CFDs** (Dukascopy, monatlich; Erdgas bis ±34 %, Zucker rollt um den 7.–9.,
+   Kakao um den 10.–12.) – ohne Bereinigung erzeugt jeder Kontraktwechsel ein falsches Überhitzungssignal.
 
 ## Haftungsausschluss
 
