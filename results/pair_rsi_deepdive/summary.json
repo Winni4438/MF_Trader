@@ -1,0 +1,99 @@
+{
+ "candidate": {
+  "rsi_h": 96,
+  "theta": 0.8,
+  "hold_h": 12,
+  "scope": "klassenübergreifend",
+  "Sharpe_IS": 1.0658230301952956,
+  "Sharpe_OOS": 0.6583805328563391,
+  "Sharpe_ALL": 0.8366302949215734,
+  "Sharpe_brutto": 0.8833987517140766,
+  "entries_pa": 54.62068965517241
+ },
+ "legs": {
+  "nur unterkühltes Bein (long)": {
+   "Sharpe_IS": 1.0004152929737968,
+   "Sharpe_OOS": 0.6951235626885363,
+   "Sharpe_ALL": 0.8107227256612521,
+   "Sharpe_brutto": 0.8544011664384386
+  },
+  "nur überhitztes Bein (short)": {
+   "Sharpe_IS": 0.31706049879139053,
+   "Sharpe_OOS": 0.4622126636352235,
+   "Sharpe_ALL": 0.30880189434420985,
+   "Sharpe_brutto": 0.3567631024024991
+  }
+ },
+ "trades": {
+  "n": 396,
+  "avg_hours": 12.0,
+  "avg_ret_bps": 57.1568916761714,
+  "median_ret_bps": 29.17576773003249,
+  "hit": 0.5782828282828283,
+  "avg_cost_bps": 13.857070707070706
+ },
+ "most_often_hot": {
+  "AVAX": 162,
+  "SOY": 120,
+  "BUND": 33,
+  "CAD": 21,
+  "MXN": 12,
+  "DOGE": 12,
+  "COPPER": 8,
+  "NOK": 6,
+  "CHF": 6,
+  "JPY": 5
+ },
+ "most_often_cold": {
+  "DAX": 47,
+  "CAC": 31,
+  "FTSE": 30,
+  "NKY": 23,
+  "SILVER": 20,
+  "SPX": 16,
+  "ASX": 16,
+  "CHF": 15,
+  "NDX": 13,
+  "NATGAS": 12
+ },
+ "mean_net_weight_top": {
+  "AVAX": -0.0002,
+  "DOGE": -0.0,
+  "XRP": -0.0,
+  "SOL": 0.0,
+  "LTC": 0.0,
+  "UST": 0.0002,
+  "EUR": 0.0002,
+  "GILT": 0.0002,
+  "CAD": 0.0003,
+  "JPY": 0.0003
+ },
+ "placebo": {
+  "real": 0.8366302949215734,
+  "mean": -0.5804647965038625,
+  "p95": 0.07405225349394337,
+  "pctl": 1.0
+ },
+ "deflated_sharpe_pairs_family": {
+  "SR_period": 0.05013066177668503,
+  "SR0_period": 0.16747437166501675,
+  "n_trials": 218,
+  "DSR": 3.061596880802298e-19,
+  "PSR_vs_0": 0.999927013099032
+ },
+ "at_10pct_vol": {
+  "CAGR": 0.07779523646700248,
+  "MaxDD": -0.07562596393846133,
+  "yearly_pct": {
+   "2019": 0.0,
+   "2020": 45.7,
+   "2021": -4.8,
+   "2022": 0.0,
+   "2023": -2.4,
+   "2024": 13.0,
+   "2025": 0.0,
+   "2026": 8.3
+  },
+  "leverage_factor_vs_1pct_leg": 15.467512955067251
+ }
+}

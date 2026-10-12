@@ -86,7 +86,7 @@ for i, c in enumerate(cv.columns):
     ax.plot(cv.index, sc.cumsum() * 100, color=C[i], lw=1.8, label=c)
 ax.axhline(0, color=BASE, lw=1)
 ax.axvline(pd.Timestamp("2023-01-01"), color=INK2, lw=1, ls="--")
-ax.set_ylabel("kumulierte Rendite in % (je Linie auf 10 % Jahresvol. skaliert)")
+ax.set_ylabel("kumulierte Rendite in %\n(je Linie auf 10 % Vol. skaliert)")
 ax.set_title("Dip-Kauf nach Kassaschluss nahe am Tagestief (IBS < 0,2), Index-Futures, nach Kosten")
 ax.legend(fontsize=8, loc="upper left")
 save(fig, "m03_ibs_futures.png")

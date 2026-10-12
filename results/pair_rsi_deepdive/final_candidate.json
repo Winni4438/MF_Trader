@@ -1,0 +1,102 @@
+{
+ "universe": [
+  "SPX",
+  "NDX",
+  "RUT",
+  "DAX",
+  "CAC",
+  "FTSE",
+  "NKY",
+  "HSI",
+  "CN50",
+  "ASX",
+  "UST",
+  "BUND",
+  "GILT",
+  "GOLD",
+  "SILVER",
+  "COPPER",
+  "BRENT",
+  "NATGAS",
+  "SUGAR",
+  "COFFEE",
+  "COCOA",
+  "EUR",
+  "GBP",
+  "JPY",
+  "CHF",
+  "AUD",
+  "NZD",
+  "CAD",
+  "NOK",
+  "MXN",
+  "ZAR",
+  "BTC",
+  "ETH"
+ ],
+ "n_pairs": 429,
+ "entries": 585,
+ "entries_pa": 80.6896551724138,
+ "netto": {
+  "Sharpe_ALL": 0.7920418311199026,
+  "Sharpe_IS": 0.668602069230891,
+  "Sharpe_OOS": 1.0065011517407096,
+  "Sharpe_brutto": 0.8388996841265441
+ },
+ "latency_cost": {
+  "delay0_cost1.0": 0.7920418311199026,
+  "delay0_cost2.0": 0.7430865338118208,
+  "delay1_cost1.0": 0.7846853465497746,
+  "delay1_cost2.0": 0.7382680147875396,
+  "delay2_cost1.0": 0.7520686181248104,
+  "delay2_cost2.0": 0.7031343443163482,
+  "delay4_cost1.0": 0.6953180205100121,
+  "delay4_cost2.0": 0.6431558920564061
+ },
+ "legs": {
+  "long (unterkühlt)": 0.4948413916959507,
+  "short (überhitzt)": 0.9680623296760804
+ },
+ "at_10pct_vol": {
+  "CAGR": 0.07679529602721735,
+  "MaxDD": -0.0678863564643396,
+  "yearly_pct": {
+   "2019": 8.1,
+   "2020": 11.0,
+   "2021": 2.9,
+   "2022": 1.5,
+   "2023": 1.0,
+   "2024": 13.9,
+   "2025": 8.8,
+   "2026": 12.2
+  },
+  "Hebel_vs_1pct_je_Bein": 2.0051581447700415,
+  "mittlere_Brutto_Exposure_bei_10pct_vol": 0.048712402898177194
+ },
+ "hot_top": {
+  "BUND": 77,
+  "JPY": 56,
+  "CHF": 47,
+  "BTC": 47,
+  "UST": 43,
+  "RUT": 43,
+  "MXN": 30,
+  "NATGAS": 29
+ },
+ "cold_top": {
+  "DAX": 74,
+  "FTSE": 51,
+  "CAC": 49,
+  "NKY": 49,
+  "SPX": 36,
+  "ASX": 31,
+  "SILVER": 26,
+  "CN50": 25
+ },
+ "placebo": {
+  "real": 0.7920418311199026,
+  "mean": -0.41519392728804677,
+  "p95": 0.13614131930563483,
+  "pctl": 1.0
+ }
+}

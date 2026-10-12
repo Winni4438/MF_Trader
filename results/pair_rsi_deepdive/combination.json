@@ -1,0 +1,50 @@
+{
+ "corr": {
+  "IBS US": {
+   "IBS US": 1.0,
+   "Paare RSI": 0.042,
+   "Risk-on-Momentum (Studie 1)": 0.108,
+   "Buy&Hold US": 0.644
+  },
+  "Paare RSI": {
+   "IBS US": 0.042,
+   "Paare RSI": 1.0,
+   "Risk-on-Momentum (Studie 1)": -0.015,
+   "Buy&Hold US": 0.057
+  },
+  "Risk-on-Momentum (Studie 1)": {
+   "IBS US": 0.108,
+   "Paare RSI": -0.015,
+   "Risk-on-Momentum (Studie 1)": 1.0,
+   "Buy&Hold US": 0.152
+  },
+  "Buy&Hold US": {
+   "IBS US": 0.644,
+   "Paare RSI": 0.057,
+   "Risk-on-Momentum (Studie 1)": 0.152,
+   "Buy&Hold US": 1.0
+  }
+ },
+ "portfolios_at_10pct_vol": {
+  "IBS US": {
+   "Sharpe": 1.21,
+   "CAGR": 0.123,
+   "MaxDD": -0.096
+  },
+  "IBS US + Paare": {
+   "Sharpe": 1.38,
+   "CAGR": 0.143,
+   "MaxDD": -0.061
+  },
+  "IBS US + Paare + Risk-on-Momentum": {
+   "Sharpe": 1.67,
+   "CAGR": 0.176,
+   "MaxDD": -0.05
+  },
+  "Buy&Hold US @10%": {
+   "Sharpe": 0.67,
+   "CAGR": 0.064,
+   "MaxDD": -0.166
+  }
+ }
+}
