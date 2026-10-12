@@ -1,0 +1,5 @@
+fehlt: WTI
+[     6s] Assets: 42 ['SPX', 'NDX', 'RUT', 'DAX', 'CAC', 'FTSE', 'NKY', 'HSI', 'CN50', 'ASX', 'UST', 'BUND', 'GILT', 'GOLD', 'SILVER', 'COPPER', 'BRENT', 'NATGAS', 'SOY', 'SUGAR', 'COFFEE', 'COCOA', 'EUR', 'GBP', 'JPY', 'CHF', 'AUD', 'NZD', 'CAD', 'NOK', 'MXN', 'ZAR', 'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'LTC']
+[     6s] Körbe: {'Aktien': 10, 'Anleihen': 3, 'Edelmetalle': 2, 'Industriemetalle': 1, 'Energie': 2, 'Agrar': 4, 'Hafen-FX': 2, 'Risiko-FX': 6, 'Euro/Pfund': 2, 'Krypto-Majors': 2, 'Altcoins': 8}
+[    10s] Basisgrößen fertig
+[    34s] Indikatoren: ['RSI6', 'RSI14', 'RSI48', 'RSI96', 'Z4', 'Z12', 'Z24', 'Z48', 'BB72', 'RES24']

@@ -66,17 +66,35 @@ for k, (tz, h0, h1) in SESS.items():
     rows.append({"Index": k, "Sharpe_netto": m["Sharpe"], "Sharpe_brutto": bt.metrics(res, "gross")["Sharpe"],
                  "Sharpe_bis2022": bt.metrics(res.loc[:"2022-12-31"])["Sharpe"], "Sharpe_ab2023": bt.metrics(res.loc["2023-01-01":])["Sharpe"],
                  "Trades": m["Trades"], "Zeit_im_Markt": m["TimeInMarket"]})
+us = [k for k in ("SPX", "NDX", "RUT") if k in W_all]
+res_us = bt.run(W_all[us], P, stress=stress).loc["2019-07-01":]
+m = bt.metrics(res_us)
+rows.append({"Index": "Korb USA (SPX+NDX+RUT)", "Sharpe_netto": m["Sharpe"], "Sharpe_brutto": bt.metrics(res_us, "gross")["Sharpe"],
+             "Sharpe_bis2022": bt.metrics(res_us.loc[:"2022-12-31"])["Sharpe"], "Sharpe_ab2023": bt.metrics(res_us.loc["2023-01-01":])["Sharpe"],
+             "Trades": m["Trades"], "Zeit_im_Markt": m["TimeInMarket"]})
+d_us = bt.daily(res_us)
+s10 = d_us * (0.10 / np.sqrt(252)) / d_us.std()
+eq = (1 + s10).cumprod()
+json.dump({"CAGR_at_10pct_vol": float(eq.iloc[-1] ** (252 / len(s10)) - 1), "MaxDD_at_10pct_vol": float((eq / eq.cummax() - 1).min()),
+           "yearly_pct_at_10pct_vol": {int(k): round(float(v) * 100, 1) for k, v in s10.groupby(s10.index.year).sum().items()},
+           "avg_trade_bps": float(m["AvgTrade_bps"]), "hit_rate": float(m["HitRate"])},
+          open(OUT / "us_basket_summary.json", "w"), indent=1)
 res = bt.run(W_all, P, stress=stress).loc["2019-07-01":]
 m = bt.metrics(res)
 rows.append({"Index": "Korb (alle)", "Sharpe_netto": m["Sharpe"], "Sharpe_brutto": bt.metrics(res, "gross")["Sharpe"],
              "Sharpe_bis2022": bt.metrics(res.loc[:"2022-12-31"])["Sharpe"], "Sharpe_ab2023": bt.metrics(res.loc["2023-01-01":])["Sharpe"],
              "Trades": m["Trades"], "Zeit_im_Markt": m["TimeInMarket"]})
-# Referenz: Buy & Hold desselben Korbs (risikogleich, dauerhaft investiert)
+# Referenz: Buy & Hold (risikogleich, dauerhaft investiert) – Gesamtkorb und US-Korb
+Wbu = pd.DataFrame({k: 0.10 / vol[k] for k in us}).fillna(0.0) / len(us)
+rbu = bt.run(Wbu, P, stress=stress).loc["2019-07-01":]
+rows.append({"Index": "Buy & Hold Korb USA", "Sharpe_netto": bt.metrics(rbu)["Sharpe"], "Sharpe_bis2022": bt.metrics(rbu.loc[:"2022-12-31"])["Sharpe"],
+             "Sharpe_ab2023": bt.metrics(rbu.loc["2023-01-01":])["Sharpe"]})
 Wbh = pd.DataFrame({k: 0.10 / vol[k] for k in W_all.columns}).fillna(0.0) / len(W_all.columns) * 3
 rb = bt.run(Wbh, P, stress=stress).loc["2019-07-01":]
 rows.append({"Index": "Buy & Hold Korb", "Sharpe_netto": bt.metrics(rb)["Sharpe"], "Sharpe_bis2022": bt.metrics(rb.loc[:"2022-12-31"])["Sharpe"],
              "Sharpe_ab2023": bt.metrics(rb.loc["2023-01-01":])["Sharpe"]})
 df = pd.DataFrame(rows)
 df.to_csv(OUT / "ibs_futures_hourly.csv", index=False)
-pd.DataFrame({"IBS-Dip-Kauf Index-Futures (netto)": bt.daily(res).cumsum(), "brutto": bt.daily(res, "gross").cumsum()}).to_csv(OUT / "curve.csv")
+pd.DataFrame({"IBS-Dip-Kauf alle Indizes (netto)": bt.daily(res).cumsum(), "IBS-Dip-Kauf US-Indizes (netto)": d_us.cumsum(),
+              "Buy & Hold US-Indizes": bt.daily(rbu).cumsum()}).to_csv(OUT / "curve.csv")
 print(df.round(2).to_string())

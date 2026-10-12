@@ -27,6 +27,9 @@ ROLL_WINDOWS = {
 # Rohstoff-CFDs auf Front-Month-Futures: Rollen (fast) monatlich, typischerweise in der zweiten Monatshälfte
 for _k in ("NATGAS", "SOY", "SUGAR", "COFFEE", "COCOA", "WTI"):
     ROLL_WINDOWS[_k] = [(m, 15, 31) for m in range(1, 13)] + [(m, 1, 5) for m in range(1, 13)]
+# ICE-Softs rollen laut Datenanalyse zu anderen Monatsterminen (Zucker ~7.–9., Kakao ~10.–12.)
+ROLL_WINDOWS["SUGAR"] = [(m, 5, 12) for m in range(1, 13)]
+ROLL_WINDOWS["COCOA"] = [(m, 8, 16) for m in range(1, 13)]
 ROLL_GROUP = {k: "M" for k in ("NATGAS", "SOY", "SUGAR", "COFFEE", "COCOA", "WTI")}
 
 
