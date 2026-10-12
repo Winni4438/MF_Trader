@@ -1,0 +1,20 @@
+{
+  "family": "Paare",
+  "scope": "klassen\u00fcbergreifend",
+  "indicator": "RSI14",
+  "theta": 0.9,
+  "hold_max_d": 1,
+  "execution": "close",
+  "n_pairs": 1684,
+  "trades_pa": 1028.7130027333073,
+  "Sharpe_IS": 0.47972712970403686,
+  "Sharpe_OOS": -0.14319291277245247,
+  "Sharpe_ALL": 0.06947909552946714,
+  "t_ALL": 0.3054660510951052,
+  "CAGR_ALL": -0.003929615886748006,
+  "MaxDD_ALL": -0.6763097818134007,
+  "Vol_ALL": 0.19145176275147918,
+  "Turnover_pa": 182.2629097214361,
+  "CostShare": 0.7774088867216677,
+  "Sharpe_brutto_ALL": 0.31098851908559905
+}

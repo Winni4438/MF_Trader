@@ -21,7 +21,13 @@ ROLL_WINDOWS = {
     "UST": [(m, 18, 31) for m in (2, 5, 8, 11)] + [(m, 1, 5) for m in (3, 6, 9, 12)],
     # FGBL: Liefertag 10. Mrz/Jun/Sep/Dez, Wechsel in den Tagen davor
     "BUND": [(m, 1, 12) for m in (3, 6, 9, 12)] + [(m, 25, 31) for m in (2, 5, 8, 11)],
+    # Long Gilt (ICE): Lieferung im Liefermonat, Roll Ende des Vormonats
+    "GILT": [(m, 20, 31) for m in (2, 5, 8, 11)] + [(m, 1, 5) for m in (3, 6, 9, 12)],
 }
+# Rohstoff-CFDs auf Front-Month-Futures: Rollen (fast) monatlich, typischerweise in der zweiten Monatshälfte
+for _k in ("NATGAS", "SOY", "SUGAR", "COFFEE", "COCOA", "WTI"):
+    ROLL_WINDOWS[_k] = [(m, 15, 31) for m in range(1, 13)] + [(m, 1, 5) for m in range(1, 13)]
+ROLL_GROUP = {k: "M" for k in ("NATGAS", "SOY", "SUGAR", "COFFEE", "COCOA", "WTI")}
 
 
 def clean_roll_gaps(df: pd.DataFrame, key: str, report: list | None = None,
@@ -38,7 +44,7 @@ def clean_roll_gaps(df: pd.DataFrame, key: str, report: list | None = None,
     for m, d0, d1 in ROLL_WINDOWS[key]:
         in_win |= (c.index.month == m) & (c.index.day >= d0) & (c.index.day <= d1)
     # Fenster-ID: Roll-Quartal (Ende Feb + Anfang Mrz gehören zusammen)
-    qid = pd.Series((c.index + pd.Timedelta(days=10)).to_period("Q").astype(str), index=c.index)
+    qid = pd.Series((c.index.tz_convert(None) + pd.Timedelta(days=10)).to_period(ROLL_GROUP.get(key, "Q")).astype(str), index=c.index)
     adj = pd.Series(0.0, index=c.index)
     if ref is None:
         # nur Sitzungseröffnungen betrachten (Rolls passieren über Nacht)
@@ -110,7 +116,7 @@ def _load(inst) -> pd.DataFrame:
     elif inst.source == "dukascopy":
         df = pd.read_parquet(RAW / "dukascopy" / f"{inst.symbol}_h1.parquet")
         ref = None
-        if inst.key == "BUND":
+        if inst.key in ("BUND", "GILT"):
             ust = clean_roll_gaps(pd.read_parquet(RAW / "dukascopy" / "USTBONDTRUSD_h1.parquet"), "UST")
             ref = np.log(ust["close"]).diff()
         df = clean_roll_gaps(df, inst.key, ROLL_REPORT, ref)
@@ -127,9 +133,9 @@ def _load(inst) -> pd.DataFrame:
     return df.sort_index()
 
 
-def build_hourly(start="2019-01-01", end="2026-10-01", keys=None) -> dict[str, pd.DataFrame]:
+def build_hourly(start="2019-01-01", end="2026-10-01", keys=None, universe=None) -> dict[str, pd.DataFrame]:
     """Gibt dict mit 'close' (ffilled), 'open_mask' (Bar existiert), 'ret' (log-Returns close-to-close)."""
-    insts = [i for i in UNIVERSE if keys is None or i.key in keys]
+    insts = [i for i in (universe or UNIVERSE) if keys is None or i.key in keys]
     idx = pd.date_range(start, end, freq="1h", tz="UTC", inclusive="left")
     close, opn, mask, extra = {}, {}, {}, {}
     for inst in insts:

@@ -13,7 +13,17 @@ INSTR = {
     "BUNDTREUR": ("2018-06", 1000.0),
     "COPPERCMDUSD": ("2018-06", 10000.0),
 }
-END = sys.argv[1] if len(sys.argv) > 1 else "2026-09"
+EXTRA = {  # Erweiterung für die Mean-Reversion-Studie (Dezimalfaktor wird später empirisch geprüft)
+    "UKGILTTRGBP": ("2018-06", 1000.0), "GASCMDUSD": ("2018-06", 1000.0), "SOYBEANCMDUSX": ("2018-06", 1000.0),
+    "SUGARCMDUSD": ("2018-06", 1000.0), "COFFEECMDUSX": ("2018-06", 1000.0), "COCOACMDUSD": ("2018-06", 1000.0),
+    "USSC2000IDXUSD": ("2018-08", 1000.0), "CHIIDXUSD": ("2018-06", 1000.0), "HKGIDXHKD": ("2018-06", 1000.0),
+}
+if "--extra" in sys.argv:
+    INSTR = EXTRA
+_only = [a.split("=", 1)[1] for a in sys.argv if a.startswith("--only=")]
+if _only:
+    INSTR = {k: v for k, v in EXTRA.items() if k in _only[0].split(",")}
+END = next((a for a in sys.argv[1:] if not a.startswith("--")), "2026-09")
 
 for sym, (start, fac) in INSTR.items():
     out = RAW / f"{sym}_h1.parquet"
