@@ -3,3 +3,50 @@ fehlt: WTI
 [     6s] Körbe: {'Aktien': 10, 'Anleihen': 3, 'Edelmetalle': 2, 'Industriemetalle': 1, 'Energie': 2, 'Agrar': 4, 'Hafen-FX': 2, 'Risiko-FX': 6, 'Euro/Pfund': 2, 'Krypto-Majors': 2, 'Altcoins': 8}
 [    10s] Basisgrößen fertig
 [    34s] Indikatoren: ['RSI6', 'RSI14', 'RSI48', 'RSI96', 'Z4', 'Z12', 'Z24', 'Z48', 'BB72', 'RES24']
+[   542s] Einzelasset: 1008
+[   542s] Paare gesamt 861 gleiche Klasse 146 klassenübergreifend 715
+/home/user/MF_Trader/scripts/run_meanrev_hourly.py:151: RuntimeWarning: invalid value encountered in subtract
+  S = Ov[:, ia] - Ov[:, ib]
+[  1934s] Paare: 84
+[  1934s] Einzelpaare: 0
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:49: RuntimeWarning: invalid value encountered in reduce
+  return umr_sum(a, axis, dtype, out, keepdims, initial, where)
+/usr/local/lib/python3.13/dist-packages/numpy/_core/fromnumeric.py:83: RuntimeWarning: invalid value encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+[  2287s] Körbe/Querschnitt: 127
+[  2355s] Funding: 27
+[  2464s] Konditionierung: 300
+[  2593s] Zusammenfassung: {'n_trials': 1243, 'share_IS_positive': 0.1492776886035313, 'share_OOS_positive': 0.15730337078651685, 'share_both_positive': 0.06902086677367576, 'corr_IS_OOS': 0.7078142552974762, 'mean_brutto': -0.14675229333462478, 'DSR_best_pair': {'SR_period': 0.04075680669744641, 'SR0_period': 0.19188591421001153, 'n_trials': 1246, 'DSR': 1.5348971113686119e-31, 'PSR_vs_0': 0.9991410216693956}, 'placebo_best_pair': {'real': 0.7104817759557251, 'placebo_mean': -0.003986028686214438, 'placebo_p95': 0.6266246379625285, 'pctl': 1.0}}
+[  2593s] FERTIG
